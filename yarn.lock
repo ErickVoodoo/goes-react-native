@@ -4549,9 +4549,11 @@ react-native-sqlite-storage@^3.3.3:
   dependencies:
     xcode "0.8.9"
 
-react-native-swipe-list-view@^0.4.6:
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-0.4.6.tgz#4d477c1f64af33ed6582663eb4d88cada722a435"
+react-native-swipeable@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-swipeable/-/react-native-swipeable-0.6.0.tgz#0fe551330018b83c754d27f505709a594f554370"
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-tab-navigator@^0.3.4:
   version "0.3.4"

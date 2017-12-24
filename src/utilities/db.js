@@ -159,7 +159,7 @@ export class DBHelper {
       });
 
       sql = `${sql});`;
-
+      console.log(sql);
       this.db.transaction(tx =>
         tx.executeSql(sql, null, () => {
           if (TABLENAMES.length - 1 === index) {

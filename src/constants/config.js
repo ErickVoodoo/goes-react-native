@@ -57,7 +57,7 @@ export const DEFAULT_SETTINGS: Object = {
   [SETTINGS_KEYS[7]]: CITIES[5].city,
   [SETTINGS_KEYS[8]]: '0.0.1',
   [SETTINGS_KEYS[9]]: '1',
-  [SETTINGS_KEYS[10]]: '35', 
+  [SETTINGS_KEYS[10]]: '10000', 
 };
 
 export const ANALYTIC_PAGES: Object = {

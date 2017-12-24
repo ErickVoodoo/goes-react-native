@@ -28,7 +28,7 @@ export class Screen extends React.Component {
       this.getDirections();
     }, 500);
 
-    EventEmitter.on('change__favorite__directions', () => {
+    EventEmitter.on('change__favorite', () => {
       this.getDirections();
     });
 
@@ -36,7 +36,7 @@ export class Screen extends React.Component {
   }
 
   componentWillUnmount = () => {
-    EventEmitter.removeAllListeners('change__favorite__directions');
+    EventEmitter.removeAllListeners('change__favorite');
   }
 
   navigateToDirection = (block) => () => {
@@ -110,7 +110,10 @@ export class Screen extends React.Component {
           }}
         />
         {getTabCounts('bus', items) || getTabCounts('trolley', items) || getTabCounts('tramms', items) || getTabCounts('metro', items) ?
-          <ScrollableTabView renderTabBar={() => <TapBar />}>
+          <ScrollableTabView 
+            locked 
+            renderTabBar={() => <TapBar />}
+          >
             { getTabCounts('bus', items) !== 0 &&
               <List tabLabel="Автобусы" style={styles.tabView}>
                 {buses && buses.length ?

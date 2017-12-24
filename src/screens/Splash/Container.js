@@ -134,7 +134,7 @@ export const Splash = compose(
             } else {
               Actions.replace(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS }));
             }
-          }, 3000)
+          }, 500)
         });
     },
   }),

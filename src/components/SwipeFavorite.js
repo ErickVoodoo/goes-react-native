@@ -5,9 +5,8 @@
 */
 
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 
-import Colors from '../constants/colors';
 import { SETTINGS_KEYS } from '../constants/config';
 
 type IProps = {
@@ -16,10 +15,9 @@ type IProps = {
 }
 
 export const SwipeFavorite = ({ isFavorite, onFavorite }: IProps) => (
-  <View style={styles.rowBack}>
-    <Text />
+  <View style={[styles.container, { backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]] }]}>
     <TouchableOpacity
-      style={[styles.backRightBtn, styles.backRightBtnRight, { backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]] }]}
+      style={styles.button}
       onPress={() => onFavorite(isFavorite ? 0 : 1)}
       activeOpacity={0.8}
     >
@@ -32,26 +30,18 @@ export const SwipeFavorite = ({ isFavorite, onFavorite }: IProps) => (
 );
 
 const styles = StyleSheet.create({
-  rowBack: {
-    alignItems: 'center',
-    backgroundColor: Colors.noticeText,
+  container: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 15,
+    display: 'flex',
+    alignItems: 'flex-start',
+    borderBottomWidth: 1,
+    borderBottomColor: '#fff',
   },
-  backRightBtn: {
+  button: {
+    display: 'flex',
     alignItems: 'center',
-    bottom: 0,
     justifyContent: 'center',
-    position: 'absolute',
-    top: 0,
+    flex: 1,
     width: 75,
-  },
-  backRightBtnRight: {
-    right: 0,
-  },
-  textWhite: {
-    color: Colors.noticeText,
   },
 });

@@ -5,15 +5,14 @@
 */
 
 import React from 'react';
-import { StyleSheet, ListView, Alert } from 'react-native';
+import { StyleSheet, FlatList, Alert } from 'react-native';
 import { SearchBar, List } from 'react-native-elements';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import { Actions } from 'react-native-router-flux';
 
 import EventEmitter from 'react-native-eventemitter';
 
 import request, { isNetworkConnected } from '../../utilities/request';
-import { Loader, ListItem, NoItems, SwipeFavorite } from '../../components';
+import { Loader, NoItems, Stop } from '../../components';
 
 import Colors from '../../constants/colors';
 import { SETTINGS_KEYS, API_URL, API_KEY } from '../../constants/config';
@@ -117,9 +116,7 @@ export class Screen extends React.Component {
 
     const filteredItems = items ? items
       .filter(({ n }) => n.toLowerCase().includes(search.toLowerCase()))
-      .map((item) => ({ ...item, key: item.id })) : [];
-
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+      .map((item) => ({ ...item, key: `stop_${item.id}` })) : [];
 
     return (
       <Loader isLoading={isLoading} style={styles.container}>
@@ -142,55 +139,18 @@ export class Screen extends React.Component {
         />
         { filteredItems && filteredItems.length ?
           <List style={styles.list}>
-            <SwipeListView
-              dataSource={ds.cloneWithRows(filteredItems)}
-              renderRow={({ id, n, p }) =>
-                (<ListItem
-                  key={`stops_${id}`}
-                  style={styles.list_item}
-                  title={n}
-                  subtitle={p}
+            <FlatList
+              data={filteredItems}
+              renderItem={({ item: { key, id, n, ...props } }) => (
+                <Stop
+                  id={id}
+                  n={n}
+                  key={key}
+                  {...props}
                   onPress={this.navigateToStop(n, id)}
                 />)
               }
-              renderHiddenRow={(data, secdId, rowId, rowMap) => (
-                <SwipeFavorite
-                  isFavorite={filteredItems[rowId].isfavorite === 1}
-                  onFavorite={(isFavorite) => {
-                    rowMap[`${secdId}${rowId}`].closeRow();
-
-                    setTimeout(() => {
-                      const item = items.find(({ id }) => filteredItems[rowId].id === id);
-                      const itemIndex = items.indexOf(item);
-
-                      window.DB.update({
-                        table: 'stops',
-                        values: {
-                          isfavorite: isFavorite ? 1 : 0,
-                        },
-                        where: {
-                          id: item.id,
-                        },
-                      })
-                        .then(() => {
-                          this.setState({
-                            items: [
-                              ...items.slice(0, itemIndex),
-                              {
-                                ...item,
-                                isfavorite: isFavorite,
-                              },
-                              ...items.slice(itemIndex + 1, items.length),
-                            ],
-                          });
-
-                          EventEmitter.emit('change__favorite');
-                        });
-                    }, 500);
-                  }}
-                />
-              )}
-              rightOpenValue={-75}
+              keyExtractor={item => item.key}
             />
           </List> :
           <NoItems />

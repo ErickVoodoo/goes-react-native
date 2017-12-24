@@ -5,17 +5,13 @@
 */
 
 import React from 'react';
-import { View, StyleSheet, ListView } from 'react-native';
-import { ListItem, List } from 'react-native-elements';
+import { StyleSheet, FlatList } from 'react-native';
 import { isNil } from 'lodash';
 import { Actions } from 'react-native-router-flux';
 import EventEmitter from 'react-native-eventemitter';
-import { SwipeListView } from 'react-native-swipe-list-view';
 
-import { NextTransport, Loader, SwipeFavorite } from '../../../components';
+import { Loader, DirectionStop } from '../../../components';
 import { getNextTime, makeTimeToReadableFormat } from '../../../utilities/time';
-import { getTransportColor } from '../../../utilities/parser'
-import Colors from '../../../constants/colors';
 
 import { SCREEN_SCHEDULE } from '../../../constants/routes';
 
@@ -95,7 +91,7 @@ export class Screen extends React.Component {
       })
         .then((items) => {
           this.setState({
-            items: items.filter(({ stop }) => stop),
+            items: items.filter(({ stop }) => stop).map(({ s_id, ...props }) => ({ ...props, s_id, key: `direction_stop_${s_id}` })),
             currentIdDirection: d_id,
             isLoading: false,
           });
@@ -110,90 +106,37 @@ export class Screen extends React.Component {
     const isCurrent = currentIdDirection === currentDirection.id;
     const direction = isCurrent ? currentDirection : reverseDirection;
 
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
     return (
       <Loader isLoading={isLoading} style={styles.container}>
-        <List style={styles.container}>
-          <SwipeListView
-            dataSource={ds.cloneWithRows(items)}
-            renderRow={({ stop, p, d_id, s_id, tms }, index) => {
-              const nextPrev = getNextTime(tms);
+        <FlatList
+          data={items}
+          style={styles.container}
+          renderItem={({ item: { tms, ...props } }) => {
+            const nextPrev = getNextTime(tms);
 
-              return (
-                <View
-                  key={index}
-                  style={styles.item}
-                >
-                  <View
-                    style={StyleSheet.flatten([ styles.item__type, StyleSheet.create({ i: { backgroundColor: getTransportColor(direction.type) } }).i ])}
-                  />
-                  <ListItem
-                    subtitleStyle={!p ? { height: 0 } : {}}
-                    style={styles.item_info}
-                    title={stop}
-                    subtitle={p}
-                    badge={nextPrev ? { element: <NextTransport minutes={nextPrev.minutes} time={nextPrev.time} /> } : null}
-                    onPress={() => {
-                      Actions[SCREEN_SCHEDULE]({
-                        item: {
-                          stop,
-                          d_id,
-                          s_id,
-                          r_id: direction.r_id,
-                          direction: direction.name,
-                          type: direction.type,
-                          transport: direction.transport,
-                          currentDirection: direction,
-                        },
-                        in: nextPrev && !isNil(nextPrev.minutes) ? `Через ${makeTimeToReadableFormat(nextPrev.minutes)}` : null,
-                        noDirectionNavigation: true,
-                      });
-                    }}
-                  />
-                </View>
-              );
-            }}
-            renderHiddenRow={(data, secdId, rowId, rowMap) => (
-              <SwipeFavorite
-                isFavorite={items[rowId].isfavorite === 1}
-                onFavorite={(isFavorite) => {
-                  rowMap[`${secdId}${rowId}`].closeRow();
-
-                  setTimeout(() => {
-                    const item = items.find(({ s_id }) => items[rowId].s_id === s_id);
-                    const itemIndex = items.indexOf(item);
-
-                    window.DB.update({
-                      table: 'stops',
-                      values: {
-                        isfavorite: isFavorite ? 1 : 0,
-                      },
-                      where: {
-                        id: item.s_id,
-                      },
-                    })
-                      .then(() => {
-                        this.setState({
-                          items: [
-                            ...items.slice(0, itemIndex),
-                            {
-                              ...item,
-                              isfavorite: isFavorite,
-                            },
-                            ...items.slice(itemIndex + 1, items.length),
-                          ],
-                        });
-
-                        EventEmitter.emit('change__favorite');
-                      });
-                  }, 500);
+            return (
+              <DirectionStop
+                {...props}
+                nextPrev={nextPrev}
+                onPress={() => {
+                  Actions[SCREEN_SCHEDULE]({
+                    item: {
+                      ...props,
+                      r_id: direction.r_id,
+                      direction: direction.name,
+                      type: direction.type,
+                      transport: direction.transport,
+                      currentDirection: direction,
+                    },
+                    in: nextPrev && !isNil(nextPrev.minutes) ? `Через ${makeTimeToReadableFormat(nextPrev.minutes)}` : null,
+                    noDirectionNavigation: true,
+                  });
                 }}
               />
-            )}
-            rightOpenValue={-75}
-          />
-        </List>
+            );
+          }}
+          keyExtractor={item => item.key}
+        />
       </Loader>
     );
   }
@@ -203,29 +146,5 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     backgroundColor: '#fff',
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGrayColor,
-    backgroundColor: '#fff',
-  },
-  item__type: {
-    width: 6,
-    height: '100%',
-    backgroundColor: Colors.busColor,
-    marginTop: 1,
-    marginBottom: 1,
-  },
-  item_info: {
-    height: 52,
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
 });

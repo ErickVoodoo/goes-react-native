@@ -5,20 +5,15 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList, ActionSheetIOS } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { Actions } from 'react-native-router-flux';
 import EventEmitter from 'react-native-eventemitter';
 
 import Colors from '../../constants/colors';
-import { Loader, ListItem, NoItems, TapBar, Direction } from '../../components';
+import { Loader, NoItems, TapBar, Direction, Stop } from '../../components';
 
 import { SCREEN_FAVORITE_DIRECTION, SCREEN_FAVORITE_STOP } from '../../constants/routes';
-
-const UNFAVORITE = [
-  'Удалить',
-  'Закрыть',
-];
 
 export class Screen extends React.Component {
   state = {
@@ -32,20 +27,13 @@ export class Screen extends React.Component {
       this.getFavorites();
     }, 500);
 
-    EventEmitter.on('change__favorite', () => {
-      this.getFavorites();
-    });
-
-    EventEmitter.on('change__favorite__directions', () => {
-      this.getFavorites();
-    });
+    EventEmitter.on('change__favorite', this.getFavorites);
 
     window.ANALYTIC.page(window.ANALYTIC_PAGES.FAVORITES);
   }
 
   componentWillUnmount = () => {
     EventEmitter.removeAllListeners('change__favorite');
-    EventEmitter.removeAllListeners('change__favorite__directions');
   }
 
   navigateToStop = (name, s_id) => () => {
@@ -100,45 +88,23 @@ export class Screen extends React.Component {
     return (
       <Loader isLoading={isLoading} style={styles.container}>
         { (directions && !!directions.length) || (stops && !!stops.length) ?
-          <ScrollableTabView renderTabBar={() => <TapBar />}>
+          <ScrollableTabView 
+            renderTabBar={() => <TapBar />}
+            locked
+          >
             {stops && !!stops.length &&
               <FlatList
                 tabLabel="Остановки"
                 data={stops.map(item => ({ ...item, key: `stops__${item.id}` }))}
-                renderItem={({ item: { id, n, p } }) => {
-                  return (
-                    <ListItem
-                      style={styles.list_item}
-                      title={n}
-                      subtitle={p}
-                      onPress={this.navigateToStop(n, id)}
-                      onLongPress={() => {
-                        ActionSheetIOS.showActionSheetWithOptions({
-                          options: UNFAVORITE,
-                          cancelButtonIndex: 1,
-                          destructiveButtonIndex: 0,
-                        },
-                          (buttonIndex) => {
-                            if (buttonIndex === 0) {
-                              window.DB.update({
-                                table: 'stops',
-                                values: {
-                                  isfavorite: 0,
-                                },
-                                where: {
-                                  id,
-                                },
-                              })
-                                .then(() => {
-                                  EventEmitter.emit('change__favorite');
-                                });
-                            }
-                          },
-                        );
-                      }}
-                    />
-                  );
-                }}
+                renderItem={({ item: { key, id, n, ...props } }) => (
+                  <Stop
+                    id={id}
+                    n={n}
+                    key={key}
+                    {...props}
+                    onPress={this.navigateToStop(n, id)}
+                  />)
+                }
                 keyExtractor={item => item.key}
               />
             }

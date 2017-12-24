@@ -12,7 +12,7 @@ import { List, ListItem } from 'react-native-elements';
 import EventEmitter from 'react-native-eventemitter';
 import { Actions } from 'react-native-router-flux';
 
-import { NextTransport, Loader, TransportIcon, TapBar, NoItems } from '../../../components';
+import { NextTransport, Loader, TransportIcon, TapBar, NoItems, StopDirection } from '../../../components';
 import Colors from '../../../constants/colors';
 
 import { getTabCounts } from '../../../utilities/parser';
@@ -54,12 +54,15 @@ export class Screen extends React.Component {
 
   componentDidMount = () => {
     setTimeout(() => {
-      this.getDirections()
+      this.getDirections();
     }, 500);
+
+    EventEmitter.on('change__favorite', this.getDirections);
   }
 
   componentWillUnmount = () => {
     clearInterval(this.timer);
+    EventEmitter.removeAllListeners('change__favorite');
   }
 
   getDirections = () => {
@@ -84,33 +87,8 @@ export class Screen extends React.Component {
       });
   }
 
-  onLongPress = (id, isfavorite) => {
-    ActionSheetIOS.showActionSheetWithOptions({
-      options: isfavorite ? UNFAVORITE : FAVORITE,
-      cancelButtonIndex: 1,
-      destructiveButtonIndex: isfavorite ? 0 : 10,
-    },
-    (buttonIndex) => {
-      if (buttonIndex === 0) {
-        window.DB.update({
-          table: 'directions',
-          values: {
-            isfavorite: isfavorite ? 0 : 1,
-          },
-          where: {
-            id,
-          },
-        })
-          .then(() => {
-            this.getDirections();
-            EventEmitter.emit('change__favorite__directions');
-          });
-      }
-    });
-  }
-
   render() {
-    const { fromFavorite, title, s_id } = this.props;
+    const { title, s_id } = this.props;
     const { items, isLoading } = this.state;
 
     const buses = items
@@ -136,7 +114,10 @@ export class Screen extends React.Component {
     return (
       <Loader isLoading={isLoading} style={styles.container}>
         {getTabCounts('bus', items) || getTabCounts('trolley', items) || getTabCounts('tramms', items) || getTabCounts('metro', items) ?
-          <ScrollableTabView renderTabBar={() => <TapBar />}>
+          <ScrollableTabView 
+            locked
+            renderTabBar={() => <TapBar />}
+          >
             { getTabCounts('bus', items) !== 0 &&
               <List tabLabel="Автобусы" style={styles.tabView}>
                 {buses && buses.length ?
@@ -146,17 +127,15 @@ export class Screen extends React.Component {
                       const nextPrev = getNextTime(tms);
 
                       return (
-                        <ListItem
+                        <StopDirection
                           key={key}
-                          style={styles.item_info}
-                          subtitleStyle={!p ? { height: 0 } : {}}
-                          title={direction}
-                          leftIcon={<TransportIcon
-                            number={transport}
-                            type={type}
-                          />}
-                          badge={nextPrev ? { element: <NextTransport minutes={nextPrev.minutes} time={nextPrev.time} /> } : null}
-                          onLongPress={() => this.onLongPress(d_id, isfavorite)}
+                          transport={transport}
+                          d_id={d_id}
+                          direction={direction} 
+                          p={p} 
+                          type={type}
+                          nextPrev={nextPrev}
+                          isfavorite={isfavorite}
                           onPress={() => {
                             Actions[SCREEN_SCHEDULE]({
                               item: {
@@ -197,17 +176,15 @@ export class Screen extends React.Component {
                       const nextPrev = getNextTime(tms);
 
                       return (
-                        <ListItem
+                        <StopDirection
                           key={key}
-                          style={styles.item_info}
-                          subtitleStyle={!p ? { height: 0 } : {}}
-                          title={direction}
-                          leftIcon={<TransportIcon
-                            number={transport}
-                            type={type}
-                          />}
-                          badge={nextPrev ? { element: <NextTransport minutes={nextPrev.minutes} time={nextPrev.time} /> } : null}
-                          onLongPress={() => this.onLongPress(d_id, isfavorite)}
+                          transport={transport}
+                          d_id={d_id}
+                          direction={direction} 
+                          p={p} 
+                          type={type}
+                          nextPrev={nextPrev}
+                          isfavorite={isfavorite}
                           onPress={() => {
                             Actions[SCREEN_SCHEDULE]({
                               item: {
@@ -248,17 +225,15 @@ export class Screen extends React.Component {
                       const nextPrev = getNextTime(tms);
 
                       return (
-                        <ListItem
+                        <StopDirection
                           key={key}
-                          style={styles.item_info}
-                          subtitleStyle={!p ? { height: 0 } : {}}
-                          title={direction}
-                          leftIcon={<TransportIcon
-                            number={transport}
-                            type={type}
-                          />}
-                          badge={nextPrev ? { element: <NextTransport minutes={nextPrev.minutes} time={nextPrev.time} /> } : null}
-                          onLongPress={() => this.onLongPress(d_id, isfavorite)}
+                          transport={transport}
+                          d_id={d_id}
+                          direction={direction} 
+                          p={p} 
+                          type={type}
+                          nextPrev={nextPrev}
+                          isfavorite={isfavorite}
                           onPress={() => {
                             Actions[SCREEN_SCHEDULE]({
                               item: {
@@ -299,17 +274,15 @@ export class Screen extends React.Component {
                       const nextPrev = getNextTime(tms);
 
                       return (
-                        <ListItem
+                        <StopDirection
                           key={key}
-                          style={styles.item_info}
-                          subtitleStyle={!p ? { height: 0 } : {}}
-                          title={direction}
-                          leftIcon={<TransportIcon
-                            number={transport}
-                            type={type}
-                          />}
-                          badge={nextPrev ? { element: <NextTransport minutes={nextPrev.minutes} time={nextPrev.time} /> } : null}
-                          onLongPress={() => this.onLongPress(d_id, isfavorite)}
+                          transport={transport}
+                          d_id={d_id}
+                          direction={direction} 
+                          p={p} 
+                          type={type}
+                          nextPrev={nextPrev}
+                          isfavorite={isfavorite}
                           onPress={() => {
                             Actions[SCREEN_SCHEDULE]({
                               item: {
