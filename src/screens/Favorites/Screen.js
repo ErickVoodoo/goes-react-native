@@ -5,9 +5,10 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { Actions } from 'react-native-router-flux';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import EventEmitter from 'react-native-eventemitter';
 
 import Colors from '../../constants/colors';
@@ -20,6 +21,7 @@ export class Screen extends React.Component {
     stops: [],
     directions: [],
     isLoading: true,
+    refreshing: false,
   }
 
   componentWillMount = () => {
@@ -55,7 +57,13 @@ export class Screen extends React.Component {
     });
   }
 
-  getFavorites = () => {
+  getFavorites = (reload = false) => {
+    if (reload) {
+      this.setState({
+        isLoading: true,
+      });
+    }
+
     window.DB.select({
       table: 'stops',
       where: { isfavorite: 1 },
@@ -96,6 +104,12 @@ export class Screen extends React.Component {
               <FlatList
                 tabLabel="Остановки"
                 data={stops.map(item => ({ ...item, key: `stops__${item.id}` }))}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={this.state.refreshing}
+                    onRefresh={this.getFavorites}
+                  />
+                }
                 renderItem={({ item: { key, id, n, ...props } }) => (
                   <Stop
                     id={id}
@@ -111,15 +125,19 @@ export class Screen extends React.Component {
             {directions && !!directions.length &&
               <FlatList
                 tabLabel="Маршруты"
-                data={directions.map(item => ({ ...item, key: `directions__${item.id}`}))}
-                renderItem={({ item }) => {
-                  return (
-                    <Direction
-                      block={[item]}
-                      onNavigateToDirection={this.navigateToDirection}
-                    />
-                  );
-                }}
+                data={directions.map(item => ({ ...item, key: `directions__${item.id}` }))}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={this.state.refreshing}
+                    onRefresh={this.getFavorites}
+                  />
+                }
+                renderItem={({ item }) => (
+                  <Direction
+                    block={[item]}
+                    onNavigateToDirection={this.navigateToDirection}
+                  />
+                )}
                 keyExtractor={item => item.key}
               />
             }
@@ -127,7 +145,19 @@ export class Screen extends React.Component {
           <NoItems
             noIcon
             message='Добавь нужные остановки или маршруты для того что бы увидеть их тут'
-          />
+          >
+            <TouchableOpacity
+              onPress={() => this.getFavorites(true)}
+              activeOpacity={0.4}
+              style={{ marginTop: 12 }}
+            >
+              <FontAwesome 
+                name={'refresh'}
+                size={24}
+                color={'#a6a6a6'}
+              />
+            </TouchableOpacity>
+          </NoItems>
         }
       </Loader>
     );

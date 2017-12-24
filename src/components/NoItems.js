@@ -4,7 +4,7 @@ import { StyleSheet, View, Text } from 'react-native';
 
 import Color from '../constants/colors';
 
-export const NoItems = ({ noIcon = false, message }: { noIcon: boolean, message: string }): void => (
+export const NoItems = ({ noIcon = false, message, children }: { noIcon: boolean, message: string, children: any }): void => (
   <View style={styles.container}>
     {!noIcon &&
     <Text style={styles.emoji}>
@@ -13,6 +13,7 @@ export const NoItems = ({ noIcon = false, message }: { noIcon: boolean, message:
     <Text style={styles.text}>
       {message || 'Упс, пусто'}
     </Text>
+    {children}
   </View>
 );
 
