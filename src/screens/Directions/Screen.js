@@ -9,14 +9,19 @@ import { StyleSheet, FlatList } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { SearchBar, List } from 'react-native-elements';
 import EventEmitter from 'react-native-eventemitter';
-import { Actions } from 'react-native-router-flux';
 
 import { Loader, TapBar, NoItems, Direction } from '../../components';
 import { getTabCounts, directoriesToBlocks } from '../../utilities/parser';
 
 import { SCREEN_DIRECTION_STOPS } from '../../constants/routes';
 
+type IProps = {
+  navigation: Object,
+}
+
 export class Screen extends React.Component {
+  props: IProps;
+
   state = {
     items: [],
     search: '',
@@ -40,7 +45,7 @@ export class Screen extends React.Component {
   }
 
   navigateToDirection = (block) => () => {
-    Actions[SCREEN_DIRECTION_STOPS]({
+    this.props.navigation.navigate(SCREEN_DIRECTION_STOPS, {
       r_id: block[0].r_id,
       title: block[0].name,
       currentDirection: block[0],

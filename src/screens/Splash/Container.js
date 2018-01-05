@@ -10,7 +10,6 @@ import { bindActionCreators } from 'redux';
 import NaturalSort from 'javascript-natural-sort';
 import { GoogleAnalyticsTracker } from 'react-native-google-analytics-bridge';
 import SQLite from 'react-native-sqlite-storage';
-import { Actions } from 'react-native-router-flux';
 import { Animated } from 'react-native'; 
 
 import { isNetworkConnected } from '../../utilities/request';
@@ -19,8 +18,8 @@ import { Screen } from './View';
 import { DATABASE_NAME, SETTINGS_KEYS, DEFAULT_SETTINGS, ANALYTIC_PAGES, ANALYTIC_EVENTS } from '../../constants/config';
 import { setSettings as actionSetSettings } from '../../store/actions/settings';
 import { DBHelper } from '../../utilities/db';
-
-import { SCREEN_STOPS, SCREEN_CITY_SELECTOR } from '../../constants/routes';
+import { replaceWith } from '../../utilities/common';
+import { SCREEN_DRAWER, SCREEN_CITY_SELECTOR } from '../../constants/routes';
 
 const mapDispatchToProps = dispatch => 
   bindActionCreators({
@@ -96,7 +95,7 @@ export const Splash = compose(
     },
   }),
   withHandlers({
-    prepareApp: ({ setSettings }) => () => {
+    prepareApp: ({ setSettings, navigation, ...props }) => () => {
       window.DB.createDatabase()
         .then(() => 
           window.DB.update({
@@ -130,9 +129,9 @@ export const Splash = compose(
         .then((meta) => {
           setTimeout(() => {
             if (meta && meta.length) {
-              Actions.jump(SCREEN_STOPS, ({ settings: window.SETTINGS }));
+              navigation.dispatch(replaceWith(SCREEN_DRAWER, ({ settings: window.SETTINGS })));
             } else {
-              Actions.replace(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS }));
+              navigation.dispatch(replaceWith(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS })));
             }
           }, 500)
         });

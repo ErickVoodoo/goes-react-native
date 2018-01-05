@@ -9,12 +9,8 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import { View, Text, StyleSheet } from 'react-native';
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
-import { Actions } from 'react-native-router-flux';
 
 import { SETTINGS_KEYS } from '../../constants/config';
-import Colors from '../../constants/colors';
-
-import { SCREEN_STOPS } from '../../constants/routes';
 
 export class Screen extends React.Component {
   onDoneHandle = () => {
@@ -28,7 +24,7 @@ export class Screen extends React.Component {
       },
     })
       .then(() => {
-        Actions[SCREEN_STOPS]();
+
       });
   }
 

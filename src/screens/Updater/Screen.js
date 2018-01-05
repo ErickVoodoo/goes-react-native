@@ -5,7 +5,6 @@
 */
 
 import React from 'react';
-import { Actions } from 'react-native-router-flux';
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { API_URL, API_KEY, SETTINGS_KEYS } from '../../constants/config';
@@ -14,6 +13,7 @@ import { parseAndSave } from '../../utilities/parser';
 import request from '../../utilities/request';
 
 type IProps = {
+  navigation: Object,
   recreate: boolean;
 }
 
@@ -120,7 +120,7 @@ export class Screen extends React.Component {
                         .map((item) => ({ 
                           ...item, 
                           isfavorite: (() => {
-                            const isFavorite = favoriteDirections.find(({ id }) => item.id === id );
+                            const isFavorite = favoriteDirections.find(({ id }) => item.id === id);
                             return isFavorite ? isFavorite.isfavorite : 0;
                           })(),
                         }))
@@ -158,6 +158,8 @@ export class Screen extends React.Component {
   }
 
   updateScheduleVersion = (key: string) => {
+    const { navigation } = this.props;
+
     request({
       path: `${API_URL(key)}metadata?key=${API_KEY}&app_version=${window.SETTINGS[SETTINGS_KEYS[10]]}`,
       method: 'POST',
@@ -186,7 +188,7 @@ export class Screen extends React.Component {
           )
           .then(() => {
             setTimeout(() => {
-              Actions.pop();
+              navigation.goBack();
             }, 2000);
           });
       });

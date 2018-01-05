@@ -5,14 +5,13 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList, ActionSheetIOS } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { isNil } from 'lodash';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { List, ListItem } from 'react-native-elements';
+import { List } from 'react-native-elements';
 import EventEmitter from 'react-native-eventemitter';
-import { Actions } from 'react-native-router-flux';
 
-import { NextTransport, Loader, TransportIcon, TapBar, NoItems, StopDirection } from '../../../components';
+import { Loader, TapBar, NoItems, StopDirection } from '../../../components';
 import Colors from '../../../constants/colors';
 
 import { getTabCounts } from '../../../utilities/parser';
@@ -20,20 +19,11 @@ import { getNextTime, makeTimeToReadableFormat } from '../../../utilities/time';
 import { SCREEN_SCHEDULE } from '../../../constants/routes';
 
 type IProps = {
-  fromFavorite: boolean,
+  params: Object,
+  navigation: Object,
   title: string,
   s_id: number | string,
 }
-
-const FAVORITE = [
-  'Сохранить',
-  'Закрыть',
-];
-
-const UNFAVORITE = [
-  'Удалить',
-  'Закрыть',
-];
 
 export class Screen extends React.Component {
   props: IProps;
@@ -66,7 +56,7 @@ export class Screen extends React.Component {
   }
 
   getDirections = () => {
-    const { s_id } = this.props;
+    const { navigation: { state: { params: { s_id } } } } = this.props;
 
     window.DB.query({
       sql: `
@@ -88,7 +78,7 @@ export class Screen extends React.Component {
   }
 
   render() {
-    const { title, s_id } = this.props;
+    const { navigation: { navigate, state: { params: { s_id, title } } } } = this.props;
     const { items, isLoading } = this.state;
 
     const buses = items
@@ -137,7 +127,7 @@ export class Screen extends React.Component {
                           nextPrev={nextPrev}
                           isfavorite={isfavorite}
                           onPress={() => {
-                            Actions[SCREEN_SCHEDULE]({
+                            navigate(SCREEN_SCHEDULE, {
                               item: {
                                 stop: title,
                                 d_id,
@@ -186,7 +176,7 @@ export class Screen extends React.Component {
                           nextPrev={nextPrev}
                           isfavorite={isfavorite}
                           onPress={() => {
-                            Actions[SCREEN_SCHEDULE]({
+                            navigate(SCREEN_SCHEDULE, {
                               item: {
                                 stop: title,
                                 d_id,
@@ -235,7 +225,7 @@ export class Screen extends React.Component {
                           nextPrev={nextPrev}
                           isfavorite={isfavorite}
                           onPress={() => {
-                            Actions[SCREEN_SCHEDULE]({
+                            navigate(SCREEN_SCHEDULE, {
                               item: {
                                 stop: title,
                                 d_id,
@@ -284,7 +274,7 @@ export class Screen extends React.Component {
                           nextPrev={nextPrev}
                           isfavorite={isfavorite}
                           onPress={() => {
-                            Actions[SCREEN_SCHEDULE]({
+                            navigate(SCREEN_SCHEDULE, {
                               item: {
                                 stop: title,
                                 d_id,

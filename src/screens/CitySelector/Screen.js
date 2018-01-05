@@ -5,17 +5,20 @@
 */
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, ActivityIndicator, View, TouchableHighlight, Image } from 'react-native';
+import { ScrollView, StyleSheet, Text, ActivityIndicator, View, TouchableHighlight } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Actions } from 'react-native-router-flux';
 
 import { Fade } from '../../components';
 import request from '../../utilities/request';
 import { parseAndSave } from '../../utilities/parser';
 import { CITIES, API_URL, API_KEY, SETTINGS_KEYS } from '../../constants/config';
 import Colors from '../../constants/colors';
+import { replaceWith } from '../../utilities/common';
+import { SCREEN_DRAWER } from '../../constants/routes';
 
-import { SCREEN_STOPS } from '../../constants/routes';
+type IProps = {
+  navigation: Object,
+};
 
 type IState = {
   selectedCity?: string | number | null,
@@ -23,6 +26,8 @@ type IState = {
 }
 
 export class Screen extends React.Component {
+  props: IProps;
+
   state: IState = {
     selectedCity: null,
     isLoading: false,
@@ -39,6 +44,7 @@ export class Screen extends React.Component {
   }
 
   onLoadSchedule = () => {
+    const { navigation } = this.props;
     const { selectedCity, isLoading } = this.state;
 
     if (selectedCity && !isLoading) {
@@ -101,7 +107,7 @@ export class Screen extends React.Component {
                             table: 'stops',
                           })
                             .then(() => {
-                              Actions.replace(SCREEN_STOPS);
+                              navigation.dispatch(replaceWith(SCREEN_DRAWER));
                             });
                         }),
                     ))

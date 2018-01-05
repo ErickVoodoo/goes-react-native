@@ -16,6 +16,7 @@ import { getNextTime, makeTimeToReadableFormat } from '../../../utilities/time';
 import { SCREEN_SCHEDULE } from '../../../constants/routes';
 
 type IProps = {
+  navigation: Object,
   currentDirection: Object,
   reverseDirection: Object,
 }
@@ -36,7 +37,7 @@ export class Screen extends React.Component {
 
     EventEmitter.on('change__direction', this.changeDirection);
     EventEmitter.on('change__favorite', () => {
-      const { currentDirection: { id: c_id, r_id: c_r_id }, reverseDirection } = this.props;
+      const { navigation: { state: { params: { currentDirection: { id: c_id, r_id: c_r_id }, reverseDirection } } } } = this.props;
 
       if (reverseDirection) {
         const { id: r_id, r_id: r_r_id } = reverseDirection;
@@ -52,7 +53,7 @@ export class Screen extends React.Component {
   }
 
   componentDidMount = () => {
-    const { currentDirection: { id, r_id } } = this.props;
+    const { navigation: { state: { params: { currentDirection: { id, r_id } } } } } = this.props;
     setTimeout(() => {
       this.getSchedule(id, r_id);
     }, 500);
@@ -67,7 +68,7 @@ export class Screen extends React.Component {
   }
 
   changeDirection = () => {
-    const { currentDirection, reverseDirection } = this.props;
+    const { navigation: { state: { params: { currentDirection, reverseDirection } } } } = this.props;
 
     const isCurrent = this.state.currentIdDirection === currentDirection.id;
     this.getSchedule(isCurrent ? reverseDirection.id : currentDirection.id, isCurrent ? reverseDirection.r_id : currentDirection.r_id);
@@ -100,7 +101,7 @@ export class Screen extends React.Component {
   }
 
   render() {
-    const { currentDirection, reverseDirection } = this.props;
+    const { navigation: { navigate, state: { params: { currentDirection, reverseDirection } } } } = this.props;
     const { items, currentIdDirection, isLoading } = this.state;
 
     const isCurrent = currentIdDirection === currentDirection.id;
@@ -119,7 +120,7 @@ export class Screen extends React.Component {
                 {...props}
                 nextPrev={nextPrev}
                 onPress={() => {
-                  Actions[SCREEN_SCHEDULE]({
+                  navigate(SCREEN_SCHEDULE, {
                     item: {
                       ...props,
                       r_id: direction.r_id,

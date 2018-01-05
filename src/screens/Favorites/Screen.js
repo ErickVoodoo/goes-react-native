@@ -7,16 +7,21 @@
 import React from 'react';
 import { StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { Actions } from 'react-native-router-flux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import EventEmitter from 'react-native-eventemitter';
 
 import Colors from '../../constants/colors';
 import { Loader, NoItems, TapBar, Direction, Stop } from '../../components';
 
-import { SCREEN_FAVORITE_DIRECTION, SCREEN_FAVORITE_STOP } from '../../constants/routes';
+import { SCREEN_DIRECTION_STOPS, SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
+
+type IProps = {
+  navigation: Object,
+};
 
 export class Screen extends React.Component {
+  props: IProps;
+
   state = {
     stops: [],
     directions: [],
@@ -39,10 +44,11 @@ export class Screen extends React.Component {
   }
 
   navigateToStop = (name, s_id) => () => {
+    const { navigation } = this.props;
     const { stops } = this.state;
     const currentStop = stops.find(({ n: sName }) => sName === name);
 
-    Actions[SCREEN_FAVORITE_STOP]({
+    navigation.navigate(SCREEN_STOP_DIRECTIONS, {
       s_id,
       title: name,
       p: currentStop.p,
@@ -50,7 +56,9 @@ export class Screen extends React.Component {
   }
 
   navigateToDirection = (block) => () => {
-    Actions[SCREEN_FAVORITE_DIRECTION]({
+    const { navigation } = this.props;
+
+    navigation.navigate(SCREEN_DIRECTION_STOPS, {
       r_id: block[0].r_id,
       title: block[0].name,
       currentDirection: block[0],

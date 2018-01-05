@@ -9,7 +9,6 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'rea
 import EventEmitter from 'react-native-eventemitter';
 import hexToRgba from 'hex-rgba';
 import { isNil } from 'lodash';
-import { Actions } from 'react-native-router-flux';
 import LinearGradient from 'react-native-linear-gradient';
 import { Loader, ContainerText } from '../../components';
 import { getSchedule, daysToTime, getTransportColor } from '../../utilities/parser';
@@ -20,6 +19,7 @@ import Colors from '../../constants/colors';
 import { SCREEN_DIRECTION_STOPS, SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
 
 type IProps = {
+  navigation: Object,
   route: Object,
   item: Object,
   noDirectionNavigation: boolean,
@@ -46,7 +46,7 @@ export class Screen extends React.Component {
   timer = null;
 
   componentWillMount = () => {
-    const { item: { d_id, s_id } } = this.props;
+    const { navigation: { state: { params: { item: { d_id, s_id } } } } } = this.props;
 
     EventEmitter.on('favorite', () => {
       EventEmitter.emit('change_favorite_status', true);
@@ -87,9 +87,9 @@ export class Screen extends React.Component {
       const nextTime = getNextTime(schedule.tms);
 
       if (!isNil(nextTime.minutes)) {
-        Actions.refresh({ in: `Через ${makeTimeToReadableFormat(nextTime.minutes)}` });
+        // Actions.refresh({ in: `Через ${makeTimeToReadableFormat(nextTime.minutes)}` });
       } else {
-        Actions.refresh({ in: 'Окончен' });
+        // Actions.refresh({ in: 'Окончен' });
       }
 
       this.setState({
@@ -117,7 +117,7 @@ export class Screen extends React.Component {
   }
 
   render() {
-    const { item, noStopNavigation, noDirectionNavigation } = this.props;
+    const { navigation: { navigate, goBack, state: { params: { item, noStopNavigation, noDirectionNavigation } } } } = this.props;
     const { days = [], nextTime: { time, properDay, isPrevious } = {}, selectedDay: dayId, isLoading } = this.state;
 
     const MAIN_APPLICATION_COLOR = window.SETTINGS[SETTINGS_KEYS[0]];
@@ -148,9 +148,9 @@ export class Screen extends React.Component {
                   window.ANALYTIC.event(window.ANALYTIC_EVENTS.SCHEDULE_DIRECTION);
 
                   if (noDirectionNavigation) {
-                    Actions.pop();
+                    goBack();
                   } else {
-                    Actions[SCREEN_DIRECTION_STOPS]({
+                    navigate(SCREEN_DIRECTION_STOPS, {
                       r_id: item.r_id,
                       title: item.direction,
                       currentDirection: item.currentDirection,
@@ -178,9 +178,9 @@ export class Screen extends React.Component {
                   window.ANALYTIC.event(window.ANALYTIC_EVENTS.SCHEDULE_STOP);
 
                   if (noStopNavigation) {
-                    Actions.pop();
+                    goBack();
                   } else {
-                    Actions[SCREEN_STOP_DIRECTIONS]({
+                    navigate(SCREEN_STOP_DIRECTIONS, {
                       s_id: item.s_id,
                       title: item.stop,
                     });

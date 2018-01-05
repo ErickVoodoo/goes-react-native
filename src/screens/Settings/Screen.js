@@ -7,7 +7,6 @@
 import React from 'react';
 import { Divider, Text } from 'react-native-elements';
 import { isNil } from 'lodash';
-import { Actions } from 'react-native-router-flux';
 import { StyleSheet, ScrollView, View, TouchableOpacity, Modal, Button, Switch, Alert, Linking } from 'react-native';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
 
@@ -19,6 +18,7 @@ import { CITIES, SETTINGS_KEYS, API_KEY, API_URL } from '../../constants/config'
 import { SCREEN_UPDATER, SCREEN_CITY_SELECTOR } from '../../constants/routes';
 
 type IProps = {
+  navigation: Object,
   setSettings: Function,
 }
 
@@ -146,6 +146,7 @@ export class Screen extends React.Component {
   timerColorPicker = null;
 
   render() {
+    const { navigation } = this.props;
     const { colorSelection, isLoading, isUpdatingSchedule, freshMeta = {} } = this.state;
 
     const settings = this.getSettingsObject();
@@ -184,7 +185,7 @@ export class Screen extends React.Component {
                     isNetworkConnected()
                       .then((isConnected) => {
                         if (isConnected) {
-                          Actions[SCREEN_UPDATER]();
+                          navigation.navigate(SCREEN_UPDATER);
                         } else {
                           return Promise.reject();
                         }
@@ -224,7 +225,7 @@ export class Screen extends React.Component {
                 isNetworkConnected()
                   .then((isConnected) => {
                     if (isConnected) {
-                      Actions[SCREEN_CITY_SELECTOR]({ isChangingCity: true });
+                      navigation.navigate(SCREEN_CITY_SELECTOR, { isChangingCity: true });
                     } else {
                       return Promise.reject();
                     }
@@ -388,7 +389,7 @@ export class Screen extends React.Component {
                       isNetworkConnected()
                         .then((isConnected) => {
                           if (isConnected) {
-                            Actions[SCREEN_UPDATER]({ recreate: true });
+                            navigation.navigate(SCREEN_UPDATER, { recreate: true });
                           } else {
                             return Promise.reject();
                           }

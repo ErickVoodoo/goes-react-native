@@ -7,7 +7,6 @@
 import React from 'react';
 import { StyleSheet, FlatList, Alert } from 'react-native';
 import { SearchBar, List } from 'react-native-elements';
-import { Actions } from 'react-native-router-flux';
 
 import EventEmitter from 'react-native-eventemitter';
 
@@ -18,7 +17,13 @@ import Colors from '../../constants/colors';
 import { SETTINGS_KEYS, API_URL, API_KEY } from '../../constants/config';
 import { SCREEN_UPDATER, SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
 
+type IProps = {
+  navigation: Object,
+}
+
 export class Screen extends React.Component {
+  props: IProps;
+
   state = {
     items: [],
     search: '',
@@ -26,6 +31,8 @@ export class Screen extends React.Component {
   }
 
   componentWillMount = () => {
+    const { navigation } = this.props;
+
     setTimeout(() => {
       this.getStops();
     }, 500);
@@ -56,7 +63,7 @@ export class Screen extends React.Component {
                       {
                         text: 'Загрузить',
                         onPress: () => {
-                          Actions[SCREEN_UPDATER]();
+                          navigation.navigate(SCREEN_UPDATER);
                         },
                       },
                       {
@@ -93,10 +100,11 @@ export class Screen extends React.Component {
   }
 
   navigateToStop = (name, s_id) => () => {
+    const { navigation } = this.props;
     const { items } = this.state;
     const currentStop = items.find(({ n: sName }) => sName === name);
 
-    Actions[SCREEN_STOP_DIRECTIONS]({ s_id, title: name, p: currentStop.p });
+    navigation.navigate(SCREEN_STOP_DIRECTIONS, { s_id, title: name, p: currentStop.p });
   }
 
   getStops = () => {

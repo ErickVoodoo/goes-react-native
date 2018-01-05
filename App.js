@@ -10,7 +10,7 @@ import styled from 'styled-components/native';
 import { Provider } from 'react-redux';
 
 import { store } from './src/store/store';
-import { Routes } from './src/navigation/Router';
+import { RootNavigator, Routes } from './src/navigation/Router';
 
 const Container = styled.View`
   flex: 1;
@@ -23,7 +23,7 @@ export default () => (
       <StatusBar
         barStyle="light-content"
       />
-      <Routes />
+      <RootNavigator />
     </Container>
   </Provider>
 );
