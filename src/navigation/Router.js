@@ -27,6 +27,7 @@ import {
   SCREEN_SCHEDULE,
   SCREEN_MAP,
   SCREEN_DRAWER,
+  SCREEN_IAP,
   // SCREEN_INTRO,
 } from '../constants/routes';
 
@@ -41,8 +42,10 @@ import { Favorites } from '../screens/Favorites';
 import { Settings } from '../screens/Settings';
 import { Updater } from '../screens/Updater';
 import { MapContainer } from '../screens/Map';
-import { DEFAULT_SETTINGS, SETTINGS_KEYS } from '../constants/config';
+import { IapContainer } from '../screens/Iap';
 import { SideMenu } from './SideMenu';
+
+import { DEFAULT_SETTINGS, SETTINGS_KEYS } from '../constants/config';
 
 const SettingsRightButton = ({ navigation }: { navigation: Object }) => (
   <TouchableOpacity 
@@ -53,6 +56,17 @@ const SettingsRightButton = ({ navigation }: { navigation: Object }) => (
     <FontAwesome name={'cog'} size={20} color={'#fff'} />
   </TouchableOpacity> 
 );
+
+const IapRightButton = ({ navigation }: { navigation: Object }) => (
+  <TouchableOpacity 
+    activeOpacity={0.8} 
+    onPress={() => navigation.navigate(SCREEN_IAP)}
+    style={{ marginRight: 16 }}
+  >
+    <FontAwesome name={'cart-plus'} size={24} color={'#fff'} />
+  </TouchableOpacity> 
+);
+
 
 const ChangeDirectionRightButton = ({ reverseDirection }: { reverseDirection: Object}) => (
   reverseDirection ? (
@@ -76,7 +90,7 @@ const commonProps = ({
 const Tabs = TabNavigator({
   [SCREEN_STOPS]: {
     screen: Stops,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: () => ({
       title: 'Остановки',
       tabBarLabel: 'Остановки',
       tabBarIcon: ({ focused }: { focused: boolean }) => (
@@ -86,7 +100,6 @@ const Tabs = TabNavigator({
           color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
         />
       ),
-      headerRight: <SettingsRightButton navigation={navigation} />,
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
@@ -95,7 +108,7 @@ const Tabs = TabNavigator({
   },
   [SCREEN_DIRECTIONS]: {
     screen: Directions,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: () => ({
       title: 'Маршруты',
       tabBarLabel: 'Маршруты',
       tabBarIcon: ({ focused }: { focused: boolean }) => (
@@ -105,7 +118,6 @@ const Tabs = TabNavigator({
           color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
         />
       ),
-      headerRight: <SettingsRightButton navigation={navigation} />,
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
@@ -114,7 +126,7 @@ const Tabs = TabNavigator({
   },
   [SCREEN_FAVORITES]: {
     screen: Favorites,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: () => ({
       title: 'Сохраненные',
       tabBarLabel: 'Сохраненные',
       tabBarIcon: ({ focused }: { focused: boolean }) => (
@@ -124,7 +136,6 @@ const Tabs = TabNavigator({
           color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
         />
       ),
-      headerRight: <SettingsRightButton navigation={navigation} />,
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
@@ -160,6 +171,8 @@ const DrawerNav = DrawerNavigator({
       ...commonProps,
     }),
   },
+}, {
+  contentComponent: SideMenu,
 });
 
 export const RootNavigator = StackNavigator({
@@ -191,6 +204,7 @@ export const RootNavigator = StackNavigator({
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
+      headerRight: <SettingsRightButton navigation={navigation} />,
       ...commonProps,
     }), 
   },
@@ -224,8 +238,19 @@ export const RootNavigator = StackNavigator({
   },
   [SCREEN_SETTINGS]: {
     screen: Settings,
-    navigationOptions: () => ({
+    navigationOptions: ({ navigation }) => ({
       title: 'Настройки',
+      headerStyle: {
+        backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
+      },
+      headerRight: <IapRightButton navigation={navigation} />,
+      ...commonProps,
+    }),
+  },
+  [SCREEN_IAP]: {
+    screen: IapContainer,
+    navigationOptions: () => ({
+      title: 'Покупки',
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
@@ -243,182 +268,3 @@ export const RootNavigator = StackNavigator({
     }),
   },
 });
-
-// export const Routes = () => (
-//   <Router>
-//     <Modal hideNavBar>
-//       <Scene key="root" hideTabBar>
-//         <Scene 
-//           key={SCREEN_SPLASH}
-//           component={Splash}
-//           hideNavBar
-//           hideTabBar
-//           initial
-//         />
-//         <Scene 
-//           key={SCREEN_CITY_SELECTOR}
-//           hideTabBar
-//           hideNavBar
-//           component={CitySelector}
-//           {...CommonProps}
-//         />
-//         <Scene 
-//           key="drawer" 
-//           drawer 
-//           contentComponent={SideMenu}
-//           drawerIcon={<FontAwesome name={'bars'} size={24} color={'#fff'} />}
-//           open={false}
-//           hideNavBar
-//         >
-//           <Scene 
-//             tabs
-//             key={SCREEN_MAIN}
-//             back={false}
-//             renderRightButton={SettingsRightButton}
-//             activeTintColor={DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
-//             inactiveTintColor={'#000'}
-//             {...CommonProps}
-//             hideNavBar
-//           >
-//             <Scene
-//               key={SCREEN_STOPS}
-//               initial
-//               title='Остановки'
-//               icon={({ focused }) => (
-//                 <Ionicons
-//                   name='ios-git-branch'
-//                   size={24}
-//                   color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
-//                 />
-//               )}
-//               {...CommonProps}
-//             >
-//               <Scene 
-//                 component={Stops}
-//                 {...CommonProps}
-//                 panHandlers={null}
-//                 initial
-//               />
-//               <Scene 
-//                 key={SCREEN_STOP_DIRECTIONS}
-//                 title={({ title }) => title}
-//                 component={StopDirections}
-//                 renderRightButton={null}
-//                 backTitle={' '}
-//                 {...CommonProps}
-//                 back
-//               />
-//             </Scene>
-//             <Scene
-//               key={SCREEN_DIRECTIONS}
-//               title='Маршруты'
-//               icon={({ focused }) => (
-//                 <Ionicons
-//                   name='ios-bus-outline'
-//                   size={24}
-//                   color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
-//                 />
-//               )}
-//               {...CommonProps}
-//             >
-//               <Scene 
-//                 component={Directions}
-//                 {...CommonProps}
-//                 panHandlers={null}
-//                 initial
-//               />
-//               <Scene 
-//                 key={SCREEN_DIRECTION_STOPS}
-//                 title={({ title }) => title}
-//                 component={DirectionStops}
-//                 renderRightButton={ChangeDirectionRightButton}
-//                 backTitle={' '}
-//                 {...CommonProps}
-//                 back
-//               />
-//             </Scene>
-
-//             <Scene
-//               key={SCREEN_FAVORITES}
-//               title='Сохраненные'
-//               icon={({ focused }) => (
-//                 <Ionicons
-//                   name='ios-star-outline'
-//                   size={24}
-//                   color={!focused ? '#000' : DEFAULT_SETTINGS[SETTINGS_KEYS[0]]}
-//                 />
-//               )}
-//               {...CommonProps}
-//             >
-//               <Scene 
-//                 component={Favorites}
-//                 {...CommonProps}
-//                 panHandlers={null}
-//                 initial
-//               />
-//               <Scene 
-//                 key={SCREEN_FAVORITE_DIRECTION}
-//                 title={({ title }) => title}
-//                 component={DirectionStops}
-//                 renderRightButton={null}
-//                 backTitle={' '}
-//                 {...CommonProps}
-//                 back
-//               />
-//               <Scene 
-//                 key={SCREEN_FAVORITE_STOP}
-//                 title={({ title }) => title}
-//                 component={StopDirections}
-//                 renderRightButton={null}
-//                 backTitle={' '}
-//                 {...CommonProps}
-//               />
-//             </Scene>
-//           </Scene>
-//         </Scene>
-//         <Scene
-//           key={SCREEN_MAP}
-//           {...CommonProps}
-//           back
-//           hideNavBar
-//         >
-//           <Scene 
-//             component={MapContainer}
-//             {...CommonProps}
-//             title='Карта'
-//             initial
-//             back
-//             hideNavBar={false}
-//           />
-//         </Scene>
-//         <Scene 
-//           key={SCREEN_UPDATER}
-//           hideNavBar
-//           panHandlers={null}
-//           component={Updater}
-//           {...CommonProps}
-//         />
-//         <Scene
-//           key={SCREEN_SETTINGS}
-//           hideNavBar
-//           back
-//         >
-//           <Scene 
-//             title='Настройки'
-//             component={Settings}
-//             {...CommonProps}
-//             initial
-//             hideNavBar={false}
-//           />
-//         </Scene>
-//       </Scene>
-//       <Scene 
-//         key={SCREEN_SCHEDULE} 
-//         component={Schedule} 
-//         title={({ in: titleIn }) => titleIn}
-//         hideNavBar={false}
-//         {...CommonProps}
-//       />
-//     </Modal>
-//   </Router>
-// );

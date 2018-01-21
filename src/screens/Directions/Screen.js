@@ -21,6 +21,7 @@ type IProps = {
 
 export class Screen extends React.Component {
   props: IProps;
+  timer: null;
 
   state = {
     items: [],
@@ -37,17 +38,23 @@ export class Screen extends React.Component {
       this.getDirections();
     });
 
+    this.timer = setInterval(() => {
+      this.forceUpdate();
+    }, 5000);
+
     window.ANALYTIC.page(window.ANALYTIC_PAGES.DIRECTIONS);
   }
 
   componentWillUnmount = () => {
     EventEmitter.removeAllListeners('change__favorite');
+    clearInterval(this.timer);
   }
 
   navigateToDirection = (block) => () => {
     this.props.navigation.navigate(SCREEN_DIRECTION_STOPS, {
       r_id: block[0].r_id,
       title: block[0].name,
+      type: block[0].type,
       currentDirection: block[0],
       reverseDirection: block[1],
     });

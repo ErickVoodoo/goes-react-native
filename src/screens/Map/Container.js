@@ -7,22 +7,17 @@
 import { compose, lifecycle, withState, withHandlers } from 'recompose';
 
 import { Screen } from './Screen';
-import { CITIES } from '../../constants/config';
 
 import { MAP_RADIUSES, ZOOM_SHIFT } from './constants';
 
 export const MapContainer = compose(
-  withState('position', 'setPosition', { }),
+  withState('position', 'setPosition', {}),
   withState('stops', 'setStops', []),
   withState('search', 'setSearch', ''),
   withState('zoom', 'setZoom', { latitudeDelta: ZOOM_SHIFT * 5, longitudeDelta: ZOOM_SHIFT * 5 }),
   withState('radius', 'setRadius', MAP_RADIUSES[0]),
   withState('region', 'setRegion', null),
   withHandlers({
-    toMinsk: ({ setPosition }) => () => {
-      setPosition(CITIES[4].position);
-      this.map.animateToCoordinate(CITIES[4].position, 100);
-    },
     findMe: ({ setPosition, setZoom }) => (relocate = false) => {
       // eslint-disable-next-line
       navigator.geolocation.getCurrentPosition(

@@ -171,7 +171,8 @@ export class Screen extends React.Component {
           values: { value: Number(schedule) }, 
           where: { key: SETTINGS_KEYS[5] },
         });
-
+        window.SETTINGS[SETTINGS_KEYS[5]] = Number(schedule);
+        
         window.DB.truncate({
           table: 'meta',
         })

@@ -23,6 +23,7 @@ type IProps = {
 
 export class Screen extends React.Component {
   props: IProps;
+  timer = null;
 
   state = {
     items: [],
@@ -93,10 +94,14 @@ export class Screen extends React.Component {
     }
 
     window.ANALYTIC.page(window.ANALYTIC_PAGES.STOPS);
+    this.timer = setInterval(() => {
+      this.forceUpdate();
+    }, 5000);
   }
 
   componentWillUnmount = () => {
     EventEmitter.removeAllListeners('change__favorite');
+    clearInterval(this.timer);
   }
 
   navigateToStop = (name, s_id) => () => {

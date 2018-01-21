@@ -19,3 +19,4 @@ export const SCREEN_SCHEDULE = 'SCREEN_SCHEDULE';
 
 export const SCREEN_MAP = 'SCREEN_MAP';
 export const SCREEN_DRAWER = 'SCREEN_DRAWER';
+export const SCREEN_IAP = 'SCREEN_IAP';

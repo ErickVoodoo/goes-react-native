@@ -7,6 +7,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import EventEmitter from 'react-native-eventemitter';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import hexToRgba from 'hex-rgba';
 import { isNil } from 'lodash';
 import LinearGradient from 'react-native-linear-gradient';
@@ -29,6 +30,16 @@ type IProps = {
 const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 const DAYS_SHORT = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 
+const FavButton = ({ handleAddToFavorite, isFavorite }) => (
+  <TouchableOpacity 
+    activeOpacity={0.8} 
+    onPress={handleAddToFavorite}
+    style={{ marginRight: 16 }}
+  >
+    <FontAwesome name={isFavorite ? 'heart' : 'heart-o'} size={20} color={'#fff'} />
+  </TouchableOpacity> 
+);
+
 export class Screen extends React.Component {
   props: IProps;
 
@@ -37,7 +48,12 @@ export class Screen extends React.Component {
     nextTime: {},
     isScrolledToTime: false,
     isLoading: true,
+    isFavorite: false,
   }
+
+  static navigationOptions = ({ navigation }) => ({ 
+    headerRight: navigation.state.params.headerRight ? navigation.state.params.headerRight : null,
+  });
 
   scrolls: Object[] = [];
   times: Object[]= [];
@@ -46,7 +62,7 @@ export class Screen extends React.Component {
   timer = null;
 
   componentWillMount = () => {
-    const { navigation: { state: { params: { item: { d_id, s_id } } } } } = this.props;
+    const { navigation: { setParams, state: { params: { item: { d_id, s_id } } } } } = this.props;
 
     EventEmitter.on('favorite', () => {
       EventEmitter.emit('change_favorite_status', true);
@@ -87,9 +103,9 @@ export class Screen extends React.Component {
       const nextTime = getNextTime(schedule.tms);
 
       if (!isNil(nextTime.minutes)) {
-        // Actions.refresh({ in: `Через ${makeTimeToReadableFormat(nextTime.minutes)}` });
+        setParams({ in: `Через ${makeTimeToReadableFormat(nextTime.minutes)}` });
       } else {
-        // Actions.refresh({ in: 'Окончен' });
+        setParams({ in: 'Окончен' });
       }
 
       this.setState({
@@ -97,13 +113,61 @@ export class Screen extends React.Component {
       });
     }, 5000);
 
-    // EventEmitter.emit('change_favorite_status', true);
+    window.DB.select({
+      table: 'schedule',
+    })
+      .then((items) => {
+        const isFavorite = items.filter(({ s_id: fS_id, d_id: fD_id }) => fS_id === s_id && d_id === fD_id);
+
+        this.setState({
+          isFavorite: !!isFavorite.length,
+        }, () => {
+          setParams({
+            headerRight: <FavButton handleAddToFavorite={this.addToFavorite} isFavorite={!!isFavorite.length} />,
+          });
+        })
+      });
 
     window.ANALYTIC.page(window.ANALYTIC_PAGES.SCHEDULE);
   }
 
   componentWillUnmount = () => {
     clearInterval(this.timer);
+  }
+
+  addToFavorite = () => {
+    const { navigation: { setParams, state: { params: { item: { d_id, s_id, stop, direction, transport, type } } } } } = this.props;
+    const isFavorite = !this.state.isFavorite;
+
+    this.setState({
+      isFavorite,
+    }, () => {
+      if (isFavorite) {
+        window.DB.insert({
+          table: 'schedule',
+          values: {
+            s_id,
+            d_id,
+            direction,
+            stop,
+            transport,
+            type,
+          },
+        })
+      } else {
+        window.DB.delete({
+          table: 'schedule',
+          where: {
+            s_id,
+            d_id,
+          },
+        });
+      }
+      EventEmitter.emit('change__schedule__favorite');
+      setParams({
+        headerRight: <FavButton handleAddToFavorite={this.addToFavorite} isFavorite={isFavorite} />,
+      });
+    });
   }
 
   getRouteParams = () => this.props.route.params || {};
@@ -151,6 +215,7 @@ export class Screen extends React.Component {
                     goBack();
                   } else {
                     navigate(SCREEN_DIRECTION_STOPS, {
+                      type: item.type,
                       r_id: item.r_id,
                       title: item.direction,
                       currentDirection: item.currentDirection,
@@ -181,6 +246,7 @@ export class Screen extends React.Component {
                     goBack();
                   } else {
                     navigate(SCREEN_STOP_DIRECTIONS, {
+                      type: item.type,
                       s_id: item.s_id,
                       title: item.stop,
                     });

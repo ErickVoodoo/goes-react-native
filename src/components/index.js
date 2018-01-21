@@ -1,3 +1,4 @@
+export * from './Flex';
 export * from './Loader';
 export * from './NextTransport';
 export * from './TransportIcon';
@@ -13,4 +14,3 @@ export * from './ListItems/Direction';
 export * from './ListItems/Stop';
 export * from './ListItems/StopDirection';
 export * from './ListItems/DirectionStop';
-export * from './Flex';

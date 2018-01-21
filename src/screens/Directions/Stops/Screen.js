@@ -101,7 +101,7 @@ export class Screen extends React.Component {
   }
 
   render() {
-    const { navigation: { navigate, state: { params: { currentDirection, reverseDirection } } } } = this.props;
+    const { navigation: { navigate, state: { params: { type, currentDirection, reverseDirection } } } } = this.props;
     const { items, currentIdDirection, isLoading } = this.state;
 
     const isCurrent = currentIdDirection === currentDirection.id;
@@ -118,6 +118,7 @@ export class Screen extends React.Component {
             return (
               <DirectionStop
                 {...props}
+                type={type}
                 nextPrev={nextPrev}
                 onPress={() => {
                   navigate(SCREEN_SCHEDULE, {

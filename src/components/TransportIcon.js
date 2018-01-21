@@ -5,36 +5,50 @@
 */
 
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import styled, { css } from 'styled-components/native';
+import { prop, ifProp } from 'styled-tools';
+import { Flex } from './';
 
 import { getTransportColor } from '../utilities/parser';
 
 type IProps = {
   number: string;
   type: string;
+  small: boolean;
 }
 
-export const TransportIcon = ({ number, type }: IProps) => (
-  <View style={StyleSheet.flatten([ styles.transportIcon, StyleSheet.create({ i: { borderColor: getTransportColor(type) } }).i ])}>
-    <Text style={StyleSheet.flatten([ styles.transportIcon__text, StyleSheet.create({ i: { color: getTransportColor(type) } }).i ])}>
+const Container = styled(Flex)`
+  border-radius: 5;
+  border-width: 1.5;
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+  border-color: ${prop('color')};
+
+  ${ifProp('small',
+    css`
+      width: 24px;
+      height: 24px;
+    `,
+  )}
+`;
+
+const Text = styled.Text`
+  font-size: 14;
+  color: ${prop('color')};
+  text-align: center;
+
+  ${ifProp('small',
+    css`
+      font-size: 10;
+    `,
+  )}
+`;
+
+export const TransportIcon = ({ number, type, small }: IProps) => (
+  <Container align={'center'} justify={'center'} row color={getTransportColor(type)} small={small}>
+    <Text color={getTransportColor(type)} small={small}>
       {number}
     </Text>
-  </View>
+  </Container>
 );
-
-const styles = StyleSheet.create({
-  transportIcon: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5,
-    borderWidth: 2,
-    width: 36,
-    height: 36,
-    marginRight: 12,
-  },
-  transportIcon__text: {
-    fontSize: 14,
-  },
-});

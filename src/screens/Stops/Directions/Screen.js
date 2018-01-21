@@ -78,7 +78,7 @@ export class Screen extends React.Component {
   }
 
   render() {
-    const { navigation: { navigate, state: { params: { s_id, title } } } } = this.props;
+    const { navigation: { navigate, state: { params: { s_id, title, type } } } } = this.props;
     const { items, isLoading } = this.state;
 
     const buses = items
@@ -107,6 +107,7 @@ export class Screen extends React.Component {
           <ScrollableTabView 
             locked
             renderTabBar={() => <TapBar />}
+            initialPage={Number(type) || 0}
           >
             { getTabCounts('bus', items) !== 0 &&
               <List tabLabel="Автобусы" style={styles.tabView}>

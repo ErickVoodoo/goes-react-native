@@ -1,17 +1,41 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import styled, { css } from 'styled-components/native';
+import { ifProp } from 'styled-tools';
 import { isNil } from 'lodash';
 import { makeTimeToReadableFormat } from '../utilities/time';
 
-export const NextTransport = ({ minutes, time }: { minutes: Object, time: Object }) => {
+const Minutes = styled.Text`
+  font-size: 12px;
+  font-weight: bold;
+
+  ${ifProp('small',
+    css`
+      font-size: 10px;
+      font-weight: bold;
+    `,
+  )}
+`;
+
+const Time = styled.Text`
+  font-size: 12px;
+
+  ${ifProp('small',
+    css`
+      font-size: 10px;
+    `,
+  )}
+`;
+
+export const NextTransport = ({ minutes, time, small }: { minutes: Object, time: Object, small: boolean }) => {
   return (!isNil(minutes) && !!time &&
     <View style={styles.badge}>
-      <Text style={styles.badge__minutes}>
+      <Minutes small={small}>
         {makeTimeToReadableFormat(minutes)}
-      </Text>
-      <Text style={styles.badge__time}>
+      </Minutes>
+      <Time small={small}>
         {time}
-      </Text>
+      </Time>
     </View>
   );
 };
@@ -22,12 +46,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  badge__minutes: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  badge__time: {
-    fontSize: 12,
   },
 });

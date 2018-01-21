@@ -111,6 +111,28 @@ const TABLENAMES = [
       type: 'varchar(128)',
     }],
   },
+  {
+    name: 'schedule',
+    fields: [{
+      field: 's_id',
+      type: 'int(8)',
+    }, {
+      field: 'd_id',
+      type: 'int(8)',
+    }, {
+      field: 'direction',
+      type: 'varchar(128)',
+    }, {
+      field: 'stop',
+      type: 'varchar(128)',
+    }, {
+      field: 'transport',
+      type: 'varchar(16)',
+    }, {
+      field: 'type',
+      type: 'int(8)',
+    }],
+  },
 ];
 
 export class DBHelper {
@@ -263,6 +285,24 @@ export class DBHelper {
 
         resolve(res);
       }, reject)
+    });
+  });
+
+  deleteQuery = ({ table, where }) => {
+    const sql = squel
+      .delete()
+      .from(table);
+
+    Object.keys(where).forEach((item) => {
+      sql.where(`${item} = ${where[item]}`);
+    });
+
+    return sql.toString();
+  }
+
+  delete = ({ table = '', where = {} }: Object): void => new Promise((resolve, reject) => {
+    this.db.transaction((tx) => {
+      tx.executeSql(this.deleteQuery({ table, where }), null, resolve, reject)
     });
   });
 
