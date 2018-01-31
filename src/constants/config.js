@@ -33,9 +33,9 @@ export const CITIES: Array<Object> = [{
 }];
 
 export const API_URL: Function = (city: string = CITIES[0].key): string => `https://euanpa.ru/${city}/api/`;
-
+export const FREE_IAP: string = 'MRKRABS';
 export const API_KEY: string = 'temp_key';
-
+export const GOOGLE_API_KEY: string = 'AIzaSyDtYVvK3EpdSaH9T4vShr_41ZMHYd84VxM';
 export const DATABASE_NAME: string = 'goes_db';
 
 export const SETTINGS_KEYS: Array<string> = [
@@ -61,7 +61,7 @@ export const DEFAULT_SETTINGS: Object = {
   [SETTINGS_KEYS[5]]: '0',
   [SETTINGS_KEYS[6]]: '1', // 1 = true
   [SETTINGS_KEYS[7]]: CITIES[5].city,
-  [SETTINGS_KEYS[8]]: '0.0.1',
+  [SETTINGS_KEYS[8]]: '0.1.0',
   [SETTINGS_KEYS[9]]: '1',
   [SETTINGS_KEYS[10]]: '10000', 
 };

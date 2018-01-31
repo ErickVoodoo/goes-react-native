@@ -5,13 +5,13 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList, Alert } from 'react-native';
+import { StyleSheet, Alert } from 'react-native';
 import { SearchBar, List } from 'react-native-elements';
 
 import EventEmitter from 'react-native-eventemitter';
 
 import request, { isNetworkConnected } from '../../utilities/request';
-import { Loader, NoItems, Stop } from '../../components';
+import { Loader, NoItems, Stop, SwipableFlatList } from '../../components';
 
 import Colors from '../../constants/colors';
 import { SETTINGS_KEYS, API_URL, API_KEY } from '../../constants/config';
@@ -100,8 +100,8 @@ export class Screen extends React.Component {
   }
 
   componentWillUnmount = () => {
-    EventEmitter.removeAllListeners('change__favorite');
     clearInterval(this.timer);
+    EventEmitter.removeListener('change__favorite', this.getStops);
   }
 
   navigateToStop = (name, s_id) => () => {
@@ -151,21 +151,22 @@ export class Screen extends React.Component {
           }}
         />
         { filteredItems && filteredItems.length ?
-          <List style={styles.list}>
-            <FlatList
-              data={filteredItems}
-              renderItem={({ item: { key, id, n, ...props } }) => (
-                <Stop
-                  id={id}
-                  n={n}
-                  key={key}
-                  {...props}
-                  onPress={this.navigateToStop(n, id)}
-                />)
-              }
-              keyExtractor={item => item.key}
-            />
-          </List> :
+          <SwipableFlatList
+            rowData={filteredItems.map(({ n, id, key, ...props }) => ({
+              rowView: (<Stop
+                id={id}
+                n={n}
+                key={key}
+                {...props}
+                onPress={this.navigateToStop(n, id)}
+                style={{ height: 52 }}
+              />),
+              id,
+              ...props,
+            }))}
+            table={'stops'}
+            style={styles.list}
+          /> :
           <NoItems />
         }
       </Loader>
@@ -180,11 +181,11 @@ const styles = StyleSheet.create({
   search: {
     width: '100%',
     flexShrink: 1,
+    height: 50,
     backgroundColor: '#fff',
   },
-  list: {
+  list: { 
     flex: 1,
-    height: '100%',
     width: '100%',
   },
   list_item: {

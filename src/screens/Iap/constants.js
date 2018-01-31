@@ -1,12 +1,17 @@
 
 export const PRODUCTS = [
-  'goes_map',
+  'org.euanpa.goes.map',
+  'org.euanpa.goes.schedule',
+  'org.euanpa.goes.trial',
 ];
 
 export const MARKET_ITEMS = [{
   identifier: PRODUCTS[0],
   icon: 'map-o',
-  title: 'Map', 
-  description: 'none', 
-  priceString: '$ 0.99',
+}, {
+  identifier: PRODUCTS[1],
+  icon: 'heart-o',
+}, {
+  identifier: PRODUCTS[2],
+  icon: 'gift',
 }];

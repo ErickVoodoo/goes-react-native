@@ -31,17 +31,15 @@ export const SwipeFavorite = ({ isFavorite, onFavorite }: IProps) => (
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     display: 'flex',
     alignItems: 'flex-start',
-    borderBottomWidth: 1,
-    borderBottomColor: '#fff',
+    width: 90,
   },
   button: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    width: 75,
+    height: '100%',
+    width: '100%',
   },
 });

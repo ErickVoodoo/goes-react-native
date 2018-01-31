@@ -23,6 +23,7 @@
 		15F686389F394AE0A9746301 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AE361DBBB5414032A023078C /* Zocial.ttf */; };
 		3F9A35B4E5324B218A86E6E3 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCF144A35FA4BD68F9E931B /* libRNVectorIcons.a */; };
 		480E66C52002C4870015B6EE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 480E66C42002C4870015B6EE /* StoreKit.framework */; };
+		4848CBAF201E86CB0097C442 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4848CB90201E866B0097C442 /* libRCTPushNotification.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		60F184063F1448EABCE6025B /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B963354A0E5447AE82BFC347 /* libAirMaps.a */; };
 		62D856CA09F74B038573500E /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 86264D74DC354E9B9517E857 /* MaterialIcons.ttf */; };
@@ -246,6 +247,20 @@
 			remoteGlobalIDString = 11FA5C511C4A1296003AC2EE;
 			remoteInfo = AirMaps;
 		};
+		4848CB8F201E866B0097C442 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4848CB78201E866B0097C442 /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTPushNotification;
+		};
+		4848CB91201E866B0097C442 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4848CB78201E866B0097C442 /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D05745F1DE6004600184BB4;
+			remoteInfo = "RCTPushNotification-tvOS";
+		};
 		485B34B51FD3370E0084DA09 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -402,6 +417,7 @@
 		370A81233DDB4999B4378199 /* ReactNativeNavigation.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeNavigation.xcodeproj; path = "../node_modules/react-native-navigation/ios/ReactNativeNavigation.xcodeproj"; sourceTree = "<group>"; };
 		3DE80B74FEE64C33BE1EFA59 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		480E66C42002C4870015B6EE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4848CB78201E866B0097C442 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		487E16171FD5EAA20010E5D6 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		4898F3521FDEFC8100CB6CB6 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4CC1FD54DD074A1BA25586A9 /* libRCTVideo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTVideo.a; sourceTree = "<group>"; };
@@ -437,6 +453,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4848CBAF201E86CB0097C442 /* libRCTPushNotification.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
@@ -623,6 +640,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		4848CB79201E866B0097C442 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4848CB90201E866B0097C442 /* libRCTPushNotification.a */,
+				4848CB92201E866B0097C442 /* libRCTPushNotification-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		485B34C11FD3370F0084DA09 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -698,6 +724,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4848CB78201E866B0097C442 /* RCTPushNotification.xcodeproj */,
 				487E16171FD5EAA20010E5D6 /* RNVectorIcons.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
@@ -877,6 +904,10 @@
 				{
 					ProductGroup = 00C302D41ABCB9D200DB3ED1 /* Products */;
 					ProjectRef = 00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */;
+				},
+				{
+					ProductGroup = 4848CB79201E866B0097C442 /* Products */;
+					ProjectRef = 4848CB78201E866B0097C442 /* RCTPushNotification.xcodeproj */;
 				},
 				{
 					ProductGroup = 139105B71AF99BAD00B5F7CC /* Products */;
@@ -1117,6 +1148,20 @@
 			fileType = archive.ar;
 			path = libAirMaps.a;
 			remoteRef = 4847327B1FF0FC2300257674 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4848CB90201E866B0097C442 /* libRCTPushNotification.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTPushNotification.a;
+			remoteRef = 4848CB8F201E866B0097C442 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4848CB92201E866B0097C442 /* libRCTPushNotification-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRCTPushNotification-tvOS.a";
+			remoteRef = 4848CB91201E866B0097C442 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		485B34B61FD3370E0084DA09 /* libthird-party.a */ = {
@@ -1518,6 +1563,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = NO;
 			};
 			name = Debug;
 		};

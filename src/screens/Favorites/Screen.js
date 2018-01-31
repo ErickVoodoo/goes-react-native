@@ -5,14 +5,14 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import EventEmitter from 'react-native-eventemitter';
 
 import Colors from '../../constants/colors';
-import { Loader, NoItems, TapBar, Direction, Stop } from '../../components';
-
+import { getTwinsDirections } from '../../utilities/parser';
+import { Loader, NoItems, TapBar, Direction, Stop, SwipableFlatList } from '../../components';
 import { SCREEN_DIRECTION_STOPS, SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
 
 type IProps = {
@@ -26,7 +26,6 @@ export class Screen extends React.Component {
     stops: [],
     directions: [],
     isLoading: true,
-    refreshing: false,
   }
 
   componentWillMount = () => {
@@ -40,7 +39,7 @@ export class Screen extends React.Component {
   }
 
   componentWillUnmount = () => {
-    EventEmitter.removeAllListeners('change__favorite');
+    EventEmitter.removeListener('change__favorite', this.getFavorites);
   }
 
   navigateToStop = (name, s_id) => () => {
@@ -109,28 +108,45 @@ export class Screen extends React.Component {
             locked
           >
             {stops && !!stops.length &&
-              <FlatList
+              <SwipableFlatList
                 tabLabel="Остановки"
-                data={stops.map(item => ({ ...item, key: `stops__${item.id}` }))}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={this.state.refreshing}
-                    onRefresh={this.getFavorites}
-                  />
-                }
-                renderItem={({ item: { key, id, n, ...props } }) => (
-                  <Stop
+                rowData={stops.map(({ n, id, ...props }) => ({
+                  rowView: (<Stop
                     id={id}
                     n={n}
-                    key={key}
+                    key={`stops__${id}`}
                     {...props}
                     onPress={this.navigateToStop(n, id)}
-                  />)
-                }
-                keyExtractor={item => item.key}
+                    style={{ height: 52 }}
+                  />),
+                  id,
+                  ...props,
+                }))}
+                table={'stops'}
+                style={styles.list}
               />
             }
             {directions && !!directions.length &&
+              <SwipableFlatList
+                tabLabel={'Маршруты'}
+                rowData={directions.map(({ id, transport, type, name, r_id, ...props }) => ({
+                  rowView: (<Direction
+                    transport={transport}
+                    type={type}
+                    direction={name}
+                    onPress={() => {
+                      const block = getTwinsDirections({ directions, d_id: id, r_id });
+        
+                      this.navigateToDirection(block)();
+                    }}
+                  />),
+                  id,
+                  ...props,
+                }))}
+                table={'directions'}
+              />
+            }
+            {/* {directions && !!directions.length &&
               <FlatList
                 tabLabel="Маршруты"
                 data={directions.map(item => ({ ...item, key: `directions__${item.id}` }))}
@@ -148,7 +164,7 @@ export class Screen extends React.Component {
                 )}
                 keyExtractor={item => item.key}
               />
-            }
+            } */}
           </ScrollableTabView> :
           <NoItems
             noIcon

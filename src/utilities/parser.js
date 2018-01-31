@@ -66,20 +66,16 @@ export const getTransportColor = (type) => {
   }
 }
 
-export const directoriesToBlocks = (directions) => {
-  const blocks = { r_id: [], items: [] };
+export const getTwinsDirections = ({ directions, r_id, d_id }) => {
+  const block = directions.filter(({ r_id: itemsR_id }) => itemsR_id === r_id);
 
-  directions.forEach((item) => {
-    const first = item;
-    const second = directions.find((i) => i !== first && i.r_id === first.r_id);
+  if (block.length === 1 || block[0].id === d_id) {
+    return block;
+  }
 
-    if (!blocks.r_id.includes(first.r_id)) {
-      blocks.r_id = blocks.r_id.concat([first.r_id]);
-      blocks.items = blocks.items.concat([[first, second]]);
-    }
-  });
+  block.reverse();
 
-  return blocks.items;
+  return block;
 }
 
 export const getTabCounts = (tab, items) => {
@@ -106,7 +102,7 @@ export const parseAndSave = (response, isReturnScheme = false) =>
 
     const { routes: jsonRoutes, stops } = JSON.parse(response);
 
-    const routes = jsonRoutes.map(({ id, name, type , active }) => ({ id, name, type, active }));
+    const routes = jsonRoutes.map(({ id, name, type, active }) => ({ id, name, type, active }));
 
     const directions = jsonRoutes.reduce((total, next) => {
       const r_id = next.id;

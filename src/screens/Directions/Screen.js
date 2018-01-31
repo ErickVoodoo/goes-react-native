@@ -5,13 +5,13 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { SearchBar, List } from 'react-native-elements';
+import { SearchBar } from 'react-native-elements';
 import EventEmitter from 'react-native-eventemitter';
 
-import { Loader, TapBar, NoItems, Direction } from '../../components';
-import { getTabCounts, directoriesToBlocks } from '../../utilities/parser';
+import { Loader, TapBar, NoItems, Direction, SwipableFlatList } from '../../components';
+import { getTabCounts, getTwinsDirections } from '../../utilities/parser';
 
 import { SCREEN_DIRECTION_STOPS } from '../../constants/routes';
 
@@ -34,9 +34,7 @@ export class Screen extends React.Component {
       this.getDirections();
     }, 500);
 
-    EventEmitter.on('change__favorite', () => {
-      this.getDirections();
-    });
+    EventEmitter.on('change__favorite', this.getDirections);
 
     this.timer = setInterval(() => {
       this.forceUpdate();
@@ -46,11 +44,11 @@ export class Screen extends React.Component {
   }
 
   componentWillUnmount = () => {
-    EventEmitter.removeAllListeners('change__favorite');
+    EventEmitter.removeListener('change__favorite', this.getDirections);
     clearInterval(this.timer);
   }
 
-  navigateToDirection = (block) => () => {
+  navigateToDirection = (block) => {
     this.props.navigation.navigate(SCREEN_DIRECTION_STOPS, {
       r_id: block[0].r_id,
       title: block[0].name,
@@ -82,25 +80,47 @@ export class Screen extends React.Component {
     const filteredItems = items
       .filter(({ name, transport }) => name.toLowerCase().includes(search.toLowerCase()) || transport.toString().includes(search));
 
-    const buses = directoriesToBlocks(filteredItems
+    const buses = filteredItems
       .filter(({ type }) => type === 0)
       .sort((a, b) => window.NaturalSort(a.transport, b.transport))
-      .map((item) => ({ ...item, key: `bus_${item.id}` })));
+      .map((item) => ({ ...item, key: `bus_${item.id}` }));
 
-    const trolleybuses = directoriesToBlocks(filteredItems
+    const trolleybuses = filteredItems
       .filter(({ type }) => type === 1)
       .sort((a, b) => window.NaturalSort(a.transport, b.transport))
-      .map((item) => ({ ...item, key: `trolley_${item.id}` })));
+      .map((item) => ({ ...item, key: `trolley_${item.id}` }));
 
-    const tramms = directoriesToBlocks(filteredItems
+    const tramms = filteredItems
       .filter(({ type }) => type === 2)
       .sort((a, b) => window.NaturalSort(a.transport, b.transport))
-      .map((item) => ({ ...item, key: `tramm_${item.id}` })));
+      .map((item) => ({ ...item, key: `tramm_${item.id}` }));
 
-    const metro = directoriesToBlocks(filteredItems
+    const metro = filteredItems
       .filter(({ type }) => type === 3)
       .sort((a, b) => window.NaturalSort(a.transport, b.transport))
-      .map((item) => ({ ...item, key: `metro_${item.id}` })));
+      .map((item) => ({ ...item, key: `metro_${item.id}` }));
+
+    const getList = (list, label) => (
+      <SwipableFlatList
+        tabLabel={label}
+        rowData={list.map(({ id, transport, type, name, r_id, ...props }) => ({
+          rowView: (<Direction
+            transport={transport}
+            type={type}
+            direction={name}
+            onPress={() => {
+              const block = getTwinsDirections({ directions: list, d_id: id, r_id });
+
+              this.navigateToDirection(block);
+            }}
+          />),
+          id,
+          ...props,
+        }))}
+        table={'directions'}
+        style={styles.tabView}
+      />
+    );
 
     return (
       <Loader isLoading={isLoading} style={styles.container}>
@@ -127,72 +147,24 @@ export class Screen extends React.Component {
             renderTabBar={() => <TapBar />}
           >
             { getTabCounts('bus', items) !== 0 &&
-              <List tabLabel="Автобусы" style={styles.tabView}>
-                {buses && buses.length ?
-                  <FlatList
-                    data={buses}
-                    renderItem={({ item }) =>
-                      (<Direction
-                        block={item}
-                        onNavigateToDirection={this.navigateToDirection}
-                      />)
-                    }
-                    keyExtractor={item => item[0].key}
-                  /> :
-                  <NoItems />
-                }
-              </List>
+              buses && buses.length ?
+                getList(buses, 'Автобусы') :
+                <NoItems tabLabel={'Автобусы'} />
             }
             { getTabCounts('trolley', items) !== 0 &&
-              <List tabLabel="Троллейбусы" style={styles.tabView}>
-                { trolleybuses && trolleybuses.length ?
-                  <FlatList
-                    data={trolleybuses}
-                    renderItem={({ item }) =>
-                      (<Direction
-                        block={item}
-                        onNavigateToDirection={this.navigateToDirection}
-                      />)
-                    }
-                    keyExtractor={item => item[0].key}
-                  /> :
-                  <NoItems />
-                }
-              </List>
+              trolleybuses && trolleybuses.length ?
+                getList(trolleybuses, 'Троллейбусы') :
+                <NoItems tabLabel={'Троллейбусы'} />
             }
             { getTabCounts('tramms', items) !== 0 &&
-              <List tabLabel="Трамваи" style={styles.tabView}>
-                { tramms && tramms.length ?
-                  <FlatList
-                    data={tramms}
-                    renderItem={({ item }) =>
-                      (<Direction
-                        block={item}
-                        onNavigateToDirection={this.navigateToDirection}
-                      />)
-                    }
-                    keyExtractor={item => item[0].key}
-                  /> :
-                  <NoItems />
-                }
-              </List>
+              (tramms && tramms.length ?
+                getList(tramms, 'Трамваи') :
+                <NoItems tabLabel={'Трамваи'} />)
             }
             { getTabCounts('metro', items) !== 0 &&
-              <List tabLabel="Метро" style={styles.tabView}>
-                { metro && metro.length ?
-                  <FlatList
-                    data={metro}
-                    renderItem={({ item }) =>
-                      (<Direction
-                        block={item}
-                        onNavigateToDirection={this.navigateToDirection}
-                      />)
-                    }
-                    keyExtractor={item => item[0].key}
-                  /> :
-                  <NoItems />
-                }
-              </List>
+              (metro && metro.length ?
+                getList(metro, 'Метро') :
+                <NoItems tabLabel={'Метро'} />)
             }
           </ScrollableTabView> :
           <NoItems />

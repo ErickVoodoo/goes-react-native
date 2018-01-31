@@ -114,6 +114,9 @@ const TABLENAMES = [
   {
     name: 'schedule',
     fields: [{
+      field: 'city',
+      type: 'varchar(128)',
+    }, {
       field: 's_id',
       type: 'int(8)',
     }, {
@@ -131,6 +134,22 @@ const TABLENAMES = [
     }, {
       field: 'type',
       type: 'int(8)',
+    }],
+  },
+  {
+    name: 'iap',
+    fields: [{
+      field: 'productIdentifier',
+      type: 'varchar(64)',
+    }, {
+      field: 'transactionDate',
+      type: 'int(32)',
+    }, {
+      field: 'transactionIdentifier',
+      type: 'varchar(128)',
+    }, {
+      field: 'transactionReceipt',
+      type: 'varchar(128)',
     }],
   },
 ];

@@ -49,9 +49,9 @@ import { DEFAULT_SETTINGS, SETTINGS_KEYS } from '../constants/config';
 
 const SettingsRightButton = ({ navigation }: { navigation: Object }) => (
   <TouchableOpacity 
-    activeOpacity={0.8} 
+    activeOpacity={0.6} 
     onPress={() => navigation.navigate(SCREEN_SETTINGS)}
-    style={{ marginRight: 16 }}
+    style={{ paddingHorizontal: 16, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
   >
     <FontAwesome name={'cog'} size={20} color={'#fff'} />
   </TouchableOpacity> 
@@ -59,27 +59,38 @@ const SettingsRightButton = ({ navigation }: { navigation: Object }) => (
 
 const IapRightButton = ({ navigation }: { navigation: Object }) => (
   <TouchableOpacity 
-    activeOpacity={0.8} 
+    activeOpacity={0.6} 
     onPress={() => navigation.navigate(SCREEN_IAP)}
-    style={{ marginRight: 16 }}
+    style={{ paddingHorizontal: 16, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
   >
     <FontAwesome name={'cart-plus'} size={24} color={'#fff'} />
   </TouchableOpacity> 
 );
 
-
 const ChangeDirectionRightButton = ({ reverseDirection }: { reverseDirection: Object}) => (
   reverseDirection ? (
     <TouchableOpacity 
-      activeOpacity={0.8} 
+      activeOpacity={0.6} 
       onPress={() => {
         EventEmitter.emit('change__direction');
       }}
-      style={{ marginRight: 16 }}
+      style={{ paddingHorizontal: 16, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
       <FontAwesome name={'exchange'} size={20} color={'#fff'} />
     </TouchableOpacity>) : 
     null 
+);
+
+const IapFree = () => (
+  <TouchableOpacity 
+    activeOpacity={0.6} 
+    onPress={() => {
+      EventEmitter.emit('iap_free');
+    }}
+    style={{ paddingHorizontal: 16, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+  >
+    <FontAwesome name={'diamond'} size={20} color={'#fff'} />
+  </TouchableOpacity>
 );
 
 const commonProps = ({
@@ -254,6 +265,7 @@ export const RootNavigator = StackNavigator({
       headerStyle: {
         backgroundColor: window.SETTINGS[SETTINGS_KEYS[0]],
       },
+      headerRight: <IapFree />, 
       ...commonProps,
     }),
   },

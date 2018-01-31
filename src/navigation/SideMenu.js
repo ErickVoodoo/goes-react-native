@@ -112,10 +112,13 @@ export const SideMenu = compose(
     reloadFavorites: ({ setFavoriteStops }) => () => {
       window.DB.select({
         table: 'schedule',
+        where: {
+          city: window.SETTINGS[SETTINGS_KEYS[7]],
+        },
       })
         .then((items) => {
           Promise.all([
-            ...items.map(({ d_id, s_id }) => 
+            ...items.filter(({ d_id, s_id }) => Number(d_id) && Number(s_id)).map(({ d_id, s_id }) => 
               window.DB.query({
                 sql: `
                   SELECT *

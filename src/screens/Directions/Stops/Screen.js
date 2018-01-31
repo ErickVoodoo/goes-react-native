@@ -5,12 +5,11 @@
 */
 
 import React from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { isNil } from 'lodash';
-import { Actions } from 'react-native-router-flux';
 import EventEmitter from 'react-native-eventemitter';
 
-import { Loader, DirectionStop } from '../../../components';
+import { Loader, DirectionStop, SwipableFlatList } from '../../../components';
 import { getNextTime, makeTimeToReadableFormat } from '../../../utilities/time';
 
 import { SCREEN_SCHEDULE } from '../../../constants/routes';
@@ -36,18 +35,7 @@ export class Screen extends React.Component {
     }, 5000);
 
     EventEmitter.on('change__direction', this.changeDirection);
-    EventEmitter.on('change__favorite', () => {
-      const { navigation: { state: { params: { currentDirection: { id: c_id, r_id: c_r_id }, reverseDirection } } } } = this.props;
-
-      if (reverseDirection) {
-        const { id: r_id, r_id: r_r_id } = reverseDirection;
-        const isCurrent = this.state.currentIdDirection === c_id;
-
-        this.getSchedule(isCurrent ? c_id : r_id, isCurrent ? c_r_id : r_r_id, true);
-      } else {
-        this.getSchedule(c_id, c_r_id, true);
-      }
-    });
+    EventEmitter.on('change__favorite', this.addFavorite);
 
     window.ANALYTIC.page(window.ANALYTIC_PAGES.DIRECTIONS_ITEMS);
   }
@@ -63,17 +51,29 @@ export class Screen extends React.Component {
 
   componentWillUnmount = () => {
     clearInterval(this.timer);
-    EventEmitter.removeAllListeners('change__favorite');
-    EventEmitter.removeAllListeners('change__direction');
+    EventEmitter.removeListener('change__direction', this.changeDirection);
+    EventEmitter.removeListener('change__favorite', this.addFavorite);
+  }
+
+  addFavorite = () => {
+    const { navigation: { state: { params: { currentDirection: { id: c_id, r_id: c_r_id }, reverseDirection } } } } = this.props;
+
+    if (reverseDirection) {
+      const { id: r_id, r_id: r_r_id } = reverseDirection;
+      const isCurrent = this.state.currentIdDirection === c_id;
+
+      this.getSchedule(isCurrent ? c_id : r_id, isCurrent ? c_r_id : r_r_id, true);
+    } else {
+      this.getSchedule(c_id, c_r_id, true);
+    }
   }
 
   changeDirection = () => {
-    const { navigation: { state: { params: { currentDirection, reverseDirection } } } } = this.props;
+    const { navigation: { setParams, state: { params: { currentDirection, reverseDirection } } } } = this.props;
 
     const isCurrent = this.state.currentIdDirection === currentDirection.id;
     this.getSchedule(isCurrent ? reverseDirection.id : currentDirection.id, isCurrent ? reverseDirection.r_id : currentDirection.r_id);
-
-    Actions.refresh({ title: isCurrent ? reverseDirection.name : currentDirection.name });
+    setParams({ title: isCurrent ? reverseDirection.name : currentDirection.name });
   }
 
   getSchedule = (d_id, r_id, noLoader = false) => {
@@ -109,14 +109,12 @@ export class Screen extends React.Component {
 
     return (
       <Loader isLoading={isLoading} style={styles.container}>
-        <FlatList
-          data={items}
-          style={styles.container}
-          renderItem={({ item: { tms, ...props } }) => {
+        <SwipableFlatList
+          rowData={items.map(({ tms, s_id, ...props }) => {
             const nextPrev = getNextTime(tms);
 
-            return (
-              <DirectionStop
+            return ({
+              rowView: (<DirectionStop
                 {...props}
                 type={type}
                 nextPrev={nextPrev}
@@ -124,6 +122,8 @@ export class Screen extends React.Component {
                   navigate(SCREEN_SCHEDULE, {
                     item: {
                       ...props,
+                      tms,
+                      s_id,
                       r_id: direction.r_id,
                       direction: direction.name,
                       type: direction.type,
@@ -134,10 +134,13 @@ export class Screen extends React.Component {
                     noDirectionNavigation: true,
                   });
                 }}
-              />
-            );
-          }}
-          keyExtractor={item => item.key}
+              />),
+              id: s_id,
+              ...props,
+            });
+          })}
+          table={'stops'}
+          style={styles.list}
         />
       </Loader>
     );

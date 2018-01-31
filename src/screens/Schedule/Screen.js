@@ -5,7 +5,7 @@
 */
 
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import EventEmitter from 'react-native-eventemitter';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import hexToRgba from 'hex-rgba';
@@ -16,8 +16,8 @@ import { getSchedule, daysToTime, getTransportColor } from '../../utilities/pars
 import { getNextTransport, getSummOfTime, makeArrayFromTime, getCorrectHours, addZeroPrefix, getHourMinutes, makeTimeToReadableFormat, getNextTime } from '../../utilities/time';
 import { SETTINGS_KEYS } from '../../constants/config';
 import Colors from '../../constants/colors';
-
-import { SCREEN_DIRECTION_STOPS, SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
+import { PRODUCTS } from '../Iap/constants';
+import { SCREEN_DIRECTION_STOPS, SCREEN_STOP_DIRECTIONS, SCREEN_IAP } from '../../constants/routes';
 
 type IProps = {
   navigation: Object,
@@ -34,7 +34,7 @@ const FavButton = ({ handleAddToFavorite, isFavorite }) => (
   <TouchableOpacity 
     activeOpacity={0.8} 
     onPress={handleAddToFavorite}
-    style={{ marginRight: 16 }}
+    style={{ paddingHorizontal: 16, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
   >
     <FontAwesome name={isFavorite ? 'heart' : 'heart-o'} size={20} color={'#fff'} />
   </TouchableOpacity> 
@@ -113,6 +113,7 @@ export class Screen extends React.Component {
       });
     }, 5000);
 
+    
     window.DB.select({
       table: 'schedule',
     })
@@ -126,7 +127,7 @@ export class Screen extends React.Component {
             headerRight: <FavButton handleAddToFavorite={this.addToFavorite} isFavorite={!!isFavorite.length} />,
           });
         })
-      });
+      }); 
 
     window.ANALYTIC.page(window.ANALYTIC_PAGES.SCHEDULE);
   }
@@ -136,7 +137,28 @@ export class Screen extends React.Component {
   }
 
   addToFavorite = () => {
-    const { navigation: { setParams, state: { params: { item: { d_id, s_id, stop, direction, transport, type } } } } } = this.props;
+    const { navigation: { navigate, setParams, state: { params: { item: { d_id, s_id, stop, direction, transport, type } } } } } = this.props;
+
+    if (!window.IAP.find(({ productIdentifier }) => PRODUCTS[1] === productIdentifier)) {
+      Alert.alert(
+        'Информация',
+        'Для использования данного функционала, пожалуйста, приобрети его',
+        [
+          { 
+            text: 'Закрыть', 
+          },
+          { 
+            text: 'К покупкам', 
+            style: 'cancel',
+            onPress: () => navigate(SCREEN_IAP),
+          },
+        ],
+        { cancelable: true },
+      );
+
+      return;
+    }
+
     const isFavorite = !this.state.isFavorite;
 
     this.setState({
@@ -146,6 +168,7 @@ export class Screen extends React.Component {
         window.DB.insert({
           table: 'schedule',
           values: {
+            city: window.SETTINGS[SETTINGS_KEYS[7]],
             s_id,
             d_id,
             direction,
@@ -160,10 +183,12 @@ export class Screen extends React.Component {
           where: {
             s_id,
             d_id,
+            // city: window.SETTINGS[SETTINGS_KEYS[7]],
           },
         });
       }
       EventEmitter.emit('change__schedule__favorite');
+
       setParams({
         headerRight: <FavButton handleAddToFavorite={this.addToFavorite} isFavorite={isFavorite} />,
       });

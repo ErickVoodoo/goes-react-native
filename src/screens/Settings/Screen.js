@@ -13,6 +13,7 @@ import { ColorPicker, fromHsv } from 'react-native-color-picker';
 import { Loader, ListItem, Fade } from '../../components';
 import Colors from '../../constants/colors';
 import request, { isNetworkConnected, NoInternetConnection } from '../../utilities/request';
+
 import { CITIES, SETTINGS_KEYS, API_KEY, API_URL } from '../../constants/config';
 
 import { SCREEN_UPDATER, SCREEN_CITY_SELECTOR } from '../../constants/routes';
@@ -237,8 +238,8 @@ export class Screen extends React.Component {
               }}
             />
             <ListItem
-              title={'Автообновление'}
-              subtitle={'Автозагрузка новых расписаний'}
+              title={'Автопроверка обновлений'}
+              subtitle={'Проверка нового расписания при старте'}
               rightIcon={
                 <Switch
                   onValueChange={(value) => {
@@ -271,89 +272,91 @@ export class Screen extends React.Component {
           <Divider style={{ backgroundColor: '#BEBEBE' }} />
           <ListItem
             title={'Цвет приложения'}
+            onPress={() => {
+              this.setState({
+                modalColorPicker: true,
+                colorSelection: {
+                  color: settings.MAIN_APPLICATION_COLOR,
+                  colorKey: 'MAIN_APPLICATION_COLOR',
+                },
+              });
+            }}
             rightIcon={
               <ColorCircle
                 color={settings.MAIN_APPLICATION_COLOR}
-                onClick={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.MAIN_APPLICATION_COLOR,
-                      colorKey: 'MAIN_APPLICATION_COLOR',
-                    },
-                  });
-                }}
               />
             }
           />
           <ListItem
             title={'Цвет автобусов'}
+            onPress={() => {
+              this.setState({
+                modalColorPicker: true,
+                colorSelection: {
+                  color: settings.BUS_COLOR,
+                  colorKey: 'BUS_COLOR',
+                },
+              });
+            }}
             rightIcon={
               <ColorCircle
                 color={settings.BUS_COLOR}
-                onClick={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.BUS_COLOR,
-                      colorKey: 'BUS_COLOR',
-                    },
-                  });
-                }}
               />
             }
           />
           <ListItem
             title={'Цвет троллейбусов'}
+            onPress={() => {
+              this.setState({
+                modalColorPicker: true,
+                colorSelection: {
+                  color: settings.TROLL_COLOR,
+                  colorKey: 'TROLL_COLOR',
+                },
+              });
+            }}
             rightIcon={
               <ColorCircle
                 color={settings.TROLL_COLOR}
-                onClick={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.TROLL_COLOR,
-                      colorKey: 'TROLL_COLOR',
-                    },
-                  });
-                }}
               />
             }
           />
           <ListItem
             title={'Цвет трамваев'}
+            onPress={() => {
+              this.setState({
+                modalColorPicker: true,
+                colorSelection: {
+                  color: settings.TRAMM_COLOR,
+                  colorKey: 'TRAMM_COLOR',
+                },
+              });
+            }}
             rightIcon={
               <ColorCircle
                 color={settings.TRAMM_COLOR}
-                onClick={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.TRAMM_COLOR,
-                      colorKey: 'TRAMM_COLOR',
-                    },
-                  });
-                }}
               />
             }
           />
-          <ListItem
-            title={'Цвет метро'}
-            rightIcon={
-              <ColorCircle
-                color={settings.METRO_COLOR}
-                onClick={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.METRO_COLOR,
-                      colorKey: 'METRO_COLOR',
-                    },
-                  });
-                }}
-              />
-            }
-          />
+          {window.SETTINGS[SETTINGS_KEYS[7]] === CITIES[4].key &&
+            <ListItem
+              title={'Цвет метро'}
+              onPress={() => {
+                this.setState({
+                  modalColorPicker: true,
+                  colorSelection: {
+                    color: settings.METRO_COLOR,
+                    colorKey: 'METRO_COLOR',
+                  },
+                });
+              }}
+              rightIcon={
+                <ColorCircle
+                  color={settings.METRO_COLOR}
+                />
+              }
+            />
+          }
           <View style={{ paddingTop: 8, paddingBottom: 8 }}>
             <Button
               title={'Полное обновление'}
@@ -365,7 +368,7 @@ export class Screen extends React.Component {
               onPress={() => {
                 Alert.alert(
                   'Внимание',
-                  'Текущее расписание будет перезаписано новым, вы уверены?',
+                  'Текущее расписание будет перезаписано полностью новым, ты уверен? Сохраненные сотруться!',
                   [{ 
                     text: 'Обновить', 
                     onPress: () => {

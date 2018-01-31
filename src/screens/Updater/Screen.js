@@ -34,7 +34,7 @@ export class Screen extends React.Component {
   }
 
   componentDidMount = () => {
-    const { recreate = false } = this.props;
+    const { navigation: { state: { params: { recreate = false } } } } = this.props;
 
     const key = window.SETTINGS[SETTINGS_KEYS[7]];
     const version = window.SETTINGS[SETTINGS_KEYS[5]];

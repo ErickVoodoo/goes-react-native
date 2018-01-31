@@ -11,6 +11,7 @@ import NaturalSort from 'javascript-natural-sort';
 import { GoogleAnalyticsTracker } from 'react-native-google-analytics-bridge';
 import SQLite from 'react-native-sqlite-storage';
 import { Animated } from 'react-native'; 
+// import PushNotification from 'react-native-push-notification';
 
 import { isNetworkConnected } from '../../utilities/request';
 import { Screen } from './View';
@@ -108,6 +109,15 @@ export const Splash = compose(
             },
           }),
         )
+        .then(() => 
+          window.DB.select({
+            table: 'iap',
+          }),
+        )
+        .then((iap = []) => {
+          window.IAP = iap;
+          return Promise.resolve();
+        })
         .then(() =>
           window.DB.select({
             table: 'settings',
@@ -134,6 +144,11 @@ export const Splash = compose(
               navigation.dispatch(replaceWith(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS })));
             }
           }, 500)
+
+          // PushNotification.localNotificationSchedule({
+          //   message: 'My Notification Message', // (required)
+          //   date: new Date(Date.now() + (10 * 1000)) // in 60 secs
+          // });
         });
     },
   }),
