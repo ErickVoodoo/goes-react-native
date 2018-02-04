@@ -186,7 +186,7 @@ export class Screen extends React.Component {
                     isNetworkConnected()
                       .then((isConnected) => {
                         if (isConnected) {
-                          navigation.navigate(SCREEN_UPDATER);
+                          navigation.navigate(SCREEN_UPDATER, { recreate: false, getSettings: this.getSettings });
                         } else {
                           return Promise.reject();
                         }
@@ -284,6 +284,15 @@ export class Screen extends React.Component {
             rightIcon={
               <ColorCircle
                 color={settings.MAIN_APPLICATION_COLOR}
+                onPress={() => {
+                  this.setState({
+                    modalColorPicker: true,
+                    colorSelection: {
+                      color: settings.MAIN_APPLICATION_COLOR,
+                      colorKey: 'MAIN_APPLICATION_COLOR',
+                    },
+                  });
+                }}
               />
             }
           />
@@ -301,6 +310,15 @@ export class Screen extends React.Component {
             rightIcon={
               <ColorCircle
                 color={settings.BUS_COLOR}
+                onPress={() => {
+                  this.setState({
+                    modalColorPicker: true,
+                    colorSelection: {
+                      color: settings.BUS_COLOR,
+                      colorKey: 'BUS_COLOR',
+                    },
+                  });
+                }}
               />
             }
           />
@@ -318,6 +336,15 @@ export class Screen extends React.Component {
             rightIcon={
               <ColorCircle
                 color={settings.TROLL_COLOR}
+                onPress={() => {
+                  this.setState({
+                    modalColorPicker: true,
+                    colorSelection: {
+                      color: settings.TROLL_COLOR,
+                      colorKey: 'TROLL_COLOR',
+                    },
+                  });
+                }}
               />
             }
           />
@@ -335,6 +362,15 @@ export class Screen extends React.Component {
             rightIcon={
               <ColorCircle
                 color={settings.TRAMM_COLOR}
+                onPress={() => {
+                  this.setState({
+                    modalColorPicker: true,
+                    colorSelection: {
+                      color: settings.TRAMM_COLOR,
+                      colorKey: 'TRAMM_COLOR',
+                    },
+                  });
+                }}
               />
             }
           />
@@ -353,6 +389,15 @@ export class Screen extends React.Component {
               rightIcon={
                 <ColorCircle
                   color={settings.METRO_COLOR}
+                  onPress={() => {
+                    this.setState({
+                      modalColorPicker: true,
+                      colorSelection: {
+                        color: settings.METRO_COLOR,
+                        colorKey: 'METRO_COLOR',
+                      },
+                    });
+                  }}
                 />
               }
             />
@@ -392,7 +437,7 @@ export class Screen extends React.Component {
                       isNetworkConnected()
                         .then((isConnected) => {
                           if (isConnected) {
-                            navigation.navigate(SCREEN_UPDATER, { recreate: true });
+                            navigation.navigate(SCREEN_UPDATER, { recreate: true, getSettings: this.getSettings });
                           } else {
                             return Promise.reject();
                           }
@@ -488,10 +533,10 @@ export class Screen extends React.Component {
   }
 }
 
-const ColorCircle = ({ color, onClick }: { color: string, onClick: Function }) => (
+const ColorCircle = ({ color, onPress }: { color: string, onPress: Function }) => (
   <TouchableOpacity
     activeOpacity={0.8}
-    onPress={onClick}
+    onPress={onPress}
   >
     <View style={{ backgroundColor: color, width: 40, height: 40, borderRadius: 20 }} />
   </TouchableOpacity>

@@ -8,20 +8,47 @@ import { compose, lifecycle, withState, withHandlers } from 'recompose';
 import { Alert } from 'react-native'
 
 import { Screen } from './Screen';
-import { MAP_RADIUSES, ZOOM_SHIFT } from './constants';
+import { MAP_RADIUSES, MAP_TYPES } from './constants';
 import { SCREEN_IAP } from '../../constants/routes';
 import { PRODUCTS } from '../Iap/constants';
+
+let timer = null;
 
 export const MapContainer = compose(
   withState('position', 'setPosition', {}),
   withState('stops', 'setStops', []),
+  withState('searchedStops', 'setSearchedStops', null),
   withState('search', 'setSearch', ''),
-  withState('zoom', 'setZoom', { latitudeDelta: ZOOM_SHIFT * 5, longitudeDelta: ZOOM_SHIFT * 5 }),
+  withState('mapType', 'setMapType', MAP_TYPES.standard),
   withState('radius', 'setRadius', MAP_RADIUSES[0]),
-  withState('region', 'setRegion', null),
   withState('selectedMarker', 'setSelectedMarker', null),
+  withState('followsUserLocation', 'setFollowsUserLocation', false),
   withHandlers({
-    findMe: ({ setPosition, setZoom }) => (relocate = false) => {
+    searchToCoordinates: ({ stops, setSearch, setSearchedStops, position }) => (search) => {
+      setSearch(search);
+
+      if (search.length >= 3) {
+        const foundStops = stops
+          .filter(({ n }) => n.toLowerCase().includes(search.toLowerCase()));
+
+        setSearchedStops(foundStops);
+
+        if (foundStops.length === 0) {
+          foundStops.push({ lng: position.longitude, lat: position.latitude });
+        }
+
+        this.map.fitToCoordinates(
+          foundStops.map(({ lat, lng }) => ({ latitude: Number(lat), longitude: Number(lng) })),
+          {
+            edgePadding: { top: 100, right: 80, bottom: 100, left: 80 },
+            animated: true,
+          },
+        );
+      } else {
+        setSearchedStops(null);
+      }
+    },
+    findMe: ({ setPosition }) => (relocate = false) => {
       // eslint-disable-next-line
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
@@ -31,9 +58,8 @@ export const MapContainer = compose(
           };
 
           setPosition(position);
-          setZoom({ longitudeDelta: ZOOM_SHIFT * 5, latitudeDelta: ZOOM_SHIFT * 5 });
 
-          if (relocate) {
+          if (relocate && this.map) {
             this.map.animateToCoordinate(position, 500);
           }
         },
@@ -99,10 +125,15 @@ export const MapContainer = compose(
       });
 
       findMe();
+
+      timer = setInterval(() => {
+        findMe(false);
+      }, 10000);
     },
     componentWillUnmount() {
       // eslint-disable-next-line
       navigator.geolocation.clearWatch(this.watchID);
+      clearInterval(timer);
     },
   }),
 )(Screen);

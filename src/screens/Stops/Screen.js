@@ -64,7 +64,7 @@ export class Screen extends React.Component {
                       {
                         text: 'Загрузить',
                         onPress: () => {
-                          navigation.navigate(SCREEN_UPDATER);
+                          navigation.navigate(SCREEN_UPDATER, { recreate: false, getSettings: () => {} });
                         },
                       },
                       {

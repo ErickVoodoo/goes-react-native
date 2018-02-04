@@ -190,6 +190,7 @@ export class Screen extends React.Component {
           .then(() => {
             setTimeout(() => {
               navigation.goBack();
+              navigation.state.params.getSettings();
             }, 2000);
           });
       });

@@ -313,7 +313,6 @@ export class Screen extends React.Component {
                           style={[
                             styles.meta__day__button__day,
                             this.state.selectedDay === index ? styles['meta__day__button__day--active'] : null,
-                            properDay === index ? { borderColor: getTransportColor(item.type) } : null,
                           ]}
                         >
                           <Text

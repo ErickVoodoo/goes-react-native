@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MapView from 'react-native-maps';
+import hexToRgba from 'hex-rgba';
 import MapViewDirections from 'react-native-maps-directions';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -14,7 +15,7 @@ import { SearchBar } from 'react-native-elements';
 import { Flex } from '../../components';
 import { SETTINGS_KEYS, GOOGLE_API_KEY } from '../../constants/config'
 import { distanceBetweenTwoPoints } from '../../utilities/common';
-import { MAP_RADIUSES, ZOOM_SHIFT } from './constants';
+import { MAP_RADIUSES, ZOOM_SHIFT, MAP_TYPES } from './constants';
 
 import { CallOut } from './Callout';
 
@@ -46,65 +47,61 @@ const SuggestionPlace = styled.View`
   padding-left: 8px;
 `;
 
+let searchRef = null;
+
 export const Screen = ({ 
   navigation, 
   stops, 
   position, 
   findMe, 
   search, 
-  setSearch, 
-  zoom, 
-  setZoom, 
+  searchedStops,
+  searchToCoordinates,
   setPosition, 
   radius, 
   setRadius, 
-  region, 
-  setRegion,
   selectedMarker,
   setSelectedMarker,
+  mapType,
+  setMapType,
+  followsUserLocation,
+  setFollowsUserLocation,
 }: IProps) => (
   <View style={styles.container}>
     <SearchBar
       round
       lightTheme
+      ref={v => { searchRef = v; }}
       autoComplete={false}
       autoCorrect={false}
-      placeholder='Найти остановку'
+      placeholder='Найти остановку (от 3 символов)'
       containerStyle={styles.search}
       clearButtonMode='always'
-      onChangeText={setSearch}
+      onChangeText={searchToCoordinates}
       inputStyle={{
         backgroundColor: '#fff',
       }}
     />
-    <SuggestionPlace>
-      <Text>
-        { search.length >= 3 ?
-            `Найдено ${stops.filter(({ n }) => n.toLowerCase().includes(search.toLowerCase())).length} совпадений` :
-            `Для поиска необходимо минимум ${3 - search.length} символ${search.length === 2 ? '' : 'а'}` 
-        }
-      </Text>
-    </SuggestionPlace>
-    { !!Object.keys(position).length &&
+    { Object.keys(position).length ?
       <MapView
+        mapType={mapType}
+        followsUserLocation={followsUserLocation}
+        showsUserLocation
+        userLocationAnnotationTitle={'Моя позиция'}
+        showsMyLocationButton
+        showsScale
+        showsCompass
         style={styles.map}
-        region={{
-          ...(region || position),
-          ...zoom,
+        initialRegion={{
+          ...position,
+          ...{
+            latitudeDelta: ZOOM_SHIFT,
+            longitudeDelta: ZOOM_SHIFT,
+          },
         }}
         ref={map => { this.map = map; }}
-        onRegionChangeComplete={({ latitude, longitude, longitudeDelta, latitudeDelta }) => {
-          setZoom({
-            longitudeDelta,
-            latitudeDelta,
-          });
-
-          setRegion({
-            latitude,
-            longitude,
-          });
-        }}
         onPress={() => {
+          searchRef.blur();
           setSelectedMarker(null);
         }}
       >
@@ -113,17 +110,15 @@ export const Screen = ({
             key={(position.longitude + position.latitude + radius).toString()}
             center={position}
             radius={radius}
-            fillColor={'rgba(255, 0, 0, 0.1)'}
-            strokeColor={'rgba(255, 0, 0, 0.5)'}
+            fillColor={hexToRgba(window.SETTINGS[SETTINGS_KEYS[0]], 15)}
+            strokeColor={hexToRgba(window.SETTINGS[SETTINGS_KEYS[0]], 70)}
           />
         }
-        <MapView.Marker.Animated 
-          coordinate={position} 
-        />
-        {stops
-          .filter(({ n }) => n.toLowerCase().includes(search.toLowerCase()))
-          .map(({ lat, lng, ...item }) => ({ distance: distanceBetweenTwoPoints(position, { latitude: lat, longitude: lng }), lat, lng, ...item }))
-          .filter(({ distance }) => search.length >= 3 || distance < radius)
+        {(searchedStops ||
+              stops
+                .map(({ lat, lng, ...item }) => ({ distance: distanceBetweenTwoPoints(position, { latitude: lat, longitude: lng }), lat, lng, ...item }))
+                .filter(({ distance }) => distance < radius)
+          )
           .map((marker, index) => {
             let isCalloutedMarker = false;
 
@@ -144,9 +139,11 @@ export const Screen = ({
                 }}
                 pinColor={isCalloutedMarker ? 'rgb(104, 187, 145)' : window.SETTINGS[SETTINGS_KEYS[0]]}
                 onPress={() => {
-                  setTimeout(() => {
-                    setSelectedMarker(marker);
-                  }, 0);
+                  if (Number(marker.lat) !== Number(position.latitude) && Number(marker.lng) !== Number(position.longitude)) {
+                    setTimeout(() => {
+                      setSelectedMarker(marker);
+                    }, 0);
+                  }
                 }}
               />
             );
@@ -162,17 +159,16 @@ export const Screen = ({
             strokeColor={window.SETTINGS[SETTINGS_KEYS[0]]}
           />
         } 
-      </MapView>
+      </MapView> :
+      <Flex size={1} />
     }
-    {!!Object.keys(position).length &&
-      <CallOut 
-        isHidden={!selectedMarker}
-        map={this.map}
-        navigation={navigation}
-        {...selectedMarker}
-        distance={selectedMarker ? distanceBetweenTwoPoints(position, { latitude: selectedMarker.lat, longitude: selectedMarker.lng }) : 0}
-      />
-    }
+    <CallOut 
+      isHidden={!selectedMarker}
+      map={this.map}
+      navigation={navigation}
+      {...selectedMarker}
+      distance={selectedMarker ? distanceBetweenTwoPoints(position, { latitude: selectedMarker.lat, longitude: selectedMarker.lng }) : 0}
+    />
     <ButtonsPanel
       row
       align={'center'}
@@ -215,31 +211,32 @@ export const Screen = ({
       </TouchableOpacity>
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => 
-          setZoom({
-            latitudeDelta: zoom.latitudeDelta - ZOOM_SHIFT <= 0 ? zoom.latitudeDelta : zoom.latitudeDelta - ZOOM_SHIFT,
-            longitudeDelta: zoom.longitudeDelta - ZOOM_SHIFT <= 0 ? zoom.longitudeDelta : zoom.longitudeDelta - ZOOM_SHIFT,
-          })
-        }
+        onPress={() => setMapType(MAP_TYPES.standard)}
         style={{
           marginBottom: 16,
         }}
       >
         <WhiteButton>
-          <FontAwesome name='plus' size={24} color={window.SETTINGS[SETTINGS_KEYS[0]]} />
+          <FontAwesome name='map' size={20} color={mapType === MAP_TYPES.standard ? window.SETTINGS[SETTINGS_KEYS[0]] : '#e6e6e6'} />
         </WhiteButton>
       </TouchableOpacity>
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => 
-          setZoom({
-            latitudeDelta: zoom.latitudeDelta + ZOOM_SHIFT,
-            longitudeDelta: zoom.longitudeDelta + ZOOM_SHIFT,
-          })
-        }
+        onPress={() => setMapType(MAP_TYPES.hybrid)}
+        style={{
+          marginBottom: 16,
+        }}
       >
         <WhiteButton>
-          <FontAwesome name='minus' size={24} color={window.SETTINGS[SETTINGS_KEYS[0]]} />
+          <FontAwesome name='globe' size={20} color={mapType === MAP_TYPES.hybrid ? window.SETTINGS[SETTINGS_KEYS[0]] : '#e6e6e6'} />
+        </WhiteButton>
+      </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => setFollowsUserLocation(!followsUserLocation)}
+      >
+        <WhiteButton>
+          <FontAwesome name='street-view' size={20} color={followsUserLocation ? window.SETTINGS[SETTINGS_KEYS[0]] : '#e6e6e6'} />
         </WhiteButton>
       </TouchableOpacity>
     </ButtonsPanel>

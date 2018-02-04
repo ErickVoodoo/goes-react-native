@@ -18,6 +18,7 @@ const { InAppUtils } = NativeModules;
 export const IapContainer = compose(
   withState('isLoading', 'setLoading', true),
   withState('products', 'setProducts', []),
+  withState('exampleId', 'setExampleId', null),
   withHandlers({
     buyProduct: ({ setLoading }) => identifier => {
       setLoading(true);
@@ -75,7 +76,7 @@ export const IapContainer = compose(
                   table: 'iap',
                   values: PRODUCTS.map((productIdentifier) => ({ productIdentifier })),
                 });
-                Alert.alert('Поздравляю!', 'Теперь у тебя есть все фишечки и плюшечки, молодец :)');
+                Alert.alert('Воу воу!', 'Теперь у тебя есть все фишечки и плюшечки, молодец :)');
               } else {
                 Alert.alert('Что-то пошло не так', 'Увы, но этот код не подходит');
               }

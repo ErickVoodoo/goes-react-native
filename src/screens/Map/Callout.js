@@ -170,7 +170,7 @@ export class CallOut extends React.Component {
             </Flex>
             <Distance align={'center'} justify={'center'}>
               <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{parseInt(distance || 0, 10)}</Text>
-              <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{noun(parseInt(distance || 0, 10), 'метр', 'метра', 'метров')}</Text>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{noun(parseInt(distance || 0, 10), 'метр', 'метра', 'метров')}</Text>
             </Distance>
           </Content>
           <Buttons row align={'center'}>
