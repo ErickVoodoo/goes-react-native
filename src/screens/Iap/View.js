@@ -118,19 +118,21 @@ export const Screen = ({ restorePayments, buyProduct, isLoading, products, examp
     <ActivityIndicator style={{ flex: 1, height: '100%', backgroundColor: '#fff' }} /> :
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Flex column align={'flex-start'} justify={'flex-start'} style={styles.container}>
-        {products.sort((a, b) => window.NaturalSort(a.price, b.price)).map(({ title, description, priceString, price, identifier }) => (
-          <Item 
+        {products.sort((a, b) => window.NaturalSort(a.price, b.price)).map(({ title, description, priceString, price, identifier }) => {
+          const { icon, analytic } = MARKET_ITEMS.find(({ identifier: v }) => v === identifier);
+
+          return (<Item 
             key={title}
-            onPress={() => { buyProduct(identifier) }}
-            onInfo={() => { setExampleId(identifier) }}
-            icon={MARKET_ITEMS.find(({ identifier: v }) => v === identifier).icon}
+            onPress={() => { buyProduct(identifier); window.ANALYTIC.event(analytic.buy); }}
+            onInfo={() => { setExampleId(identifier); window.ANALYTIC.event(analytic.info); }}
+            icon={icon}
             title={title}
             description={description}
             priceString={priceString}
             price={price}
             disabled={window.IAP.find(({ productIdentifier }) => identifier === productIdentifier)}
-          />
-        ))}
+          />);
+        })}
       </Flex>
       <TouchableOpacity onPress={restorePayments} activeOpacity={0.6} style={{ paddingVertical: 16, paddingHorizontal: 8 }}>
         <Flex column align={'center'} justify={'center'}>

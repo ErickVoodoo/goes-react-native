@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { Animated, Easing, Text, TouchableOpacity, Image } from 'react-native';
 import { isNil } from 'lodash';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import noun from 'plural-ru';
 import { Flex } from '../../components';
 import { SCREEN_STOP_DIRECTIONS } from '../../constants/routes';
@@ -74,6 +75,7 @@ export class CallOut extends React.Component {
     super(props);
     this.state = {
       animation: new Animated.Value(-HEIGHT),
+      isMinimal: false,
       types: [],
     }
   }
@@ -97,6 +99,9 @@ export class CallOut extends React.Component {
         duration: 500,
       })
         .start();
+      this.setState({
+        isMinimal: false,
+      });
     }
 
     this.getTypes(id ? nextProps : this.props);
@@ -125,9 +130,33 @@ export class CallOut extends React.Component {
     }
   }
 
+  handleMinimal = (is) => {
+    const { animation } = this.state;
+
+    if (!is) {
+      Animated.timing(animation, {
+        toValue: 0,
+        easing: Easing.in(),
+        duration: 500,
+      })
+        .start();
+    } else {
+      Animated.timing(animation, {
+        toValue: -HEIGHT + 40,
+        easing: Easing.in(),
+        duration: 500,
+      })
+        .start();
+    }
+
+    this.setState({
+      isMinimal: is,
+    });
+  }
+
   render = () => {
     const { navigation, id, n, p, distance, lat, lng, map } = this.props;
-    const { animation, types = [] } = this.state;
+    const { animation, types = [], isMinimal } = this.state;
 
     return (
       <Animated.View
@@ -137,44 +166,54 @@ export class CallOut extends React.Component {
         }}
       >
         <Container>
-          <Icons row align={'center'}>
-            {types.includes(0) &&
-              <Image
-                style={{ width: 30, height: 30, marginRight: 8 }}
-                source={require('../../../assets/transport/bus.png')}
-              />
-            }
-            {types.includes(1) &&
-              <Image
-                style={{ width: 30, height: 30, marginRight: 8 }}
-                source={require('../../../assets/transport/trolley.png')}
-              />
-            }
-            {types.includes(2) &&
-              <Image
-                style={{ width: 30, height: 30, marginRight: 8 }}
-                source={require('../../../assets/transport/tram.png')}
-              />
-            }
-            {types.includes(3) &&
-              <Image
-                style={{ width: 30, height: 30 }}
-                source={require('../../../assets/transport/metro.png')}
-              />
-            }
+          <Icons row>
+            <Flex row size={1} align={'center'} style={{ width: 'auto' }}>
+              {types.includes(0) &&
+                <Image
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  source={require('../../../assets/transport/bus.png')}
+                />
+              }
+              {types.includes(1) &&
+                <Image
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  source={require('../../../assets/transport/trolley.png')}
+                />
+              }
+              {types.includes(2) &&
+                <Image
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  source={require('../../../assets/transport/tram.png')}
+                />
+              }
+              {types.includes(3) &&
+                <Image
+                  style={{ width: 30, height: 30 }}
+                  source={require('../../../assets/transport/metro.png')}
+                />
+              }
+            </Flex>
+            <Flex row size={1} justify={'flex-end'} align={'center'} style={{ width: 'auto' }}>
+              {isMinimal && <Text style={{ fontSize: 16, marginRight: 12, fontWeight: 'bold' }}>{`${parseInt(distance || 0, 10)} ${noun(parseInt(distance || 0, 10), 'метр', 'метра', 'метров')}`}</Text>}
+              { isMinimal ?
+                <FontAwesome name='angle-up' size={28} color={window.SETTINGS[SETTINGS_KEYS[0]]} onPress={() => this.handleMinimal(false)} /> :
+                <FontAwesome name='angle-down' size={28} color={window.SETTINGS[SETTINGS_KEYS[0]]} onPress={() => this.handleMinimal(true)} />
+              }
+            </Flex>
           </Icons>
           <Content row>
             <Flex column size={1}>
               <Title>{n}</Title>
               <Subtitle>{`${p ? `(${p})` : ''}`}</Subtitle>
             </Flex>
-            <Distance align={'center'} justify={'center'}>
-              <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{parseInt(distance || 0, 10)}</Text>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{noun(parseInt(distance || 0, 10), 'метр', 'метра', 'метров')}</Text>
-            </Distance>
+            {!isMinimal && 
+              <Distance align={'center'} justify={'center'}>
+                <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{parseInt(distance || 0, 10)}</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{noun(parseInt(distance || 0, 10), 'метр', 'метра', 'метров')}</Text>
+              </Distance>
+            }
           </Content>
           <Buttons row align={'center'}>
-            
             <TouchableOpacity 
               onPress={() => {
                 map.animateToCoordinate({

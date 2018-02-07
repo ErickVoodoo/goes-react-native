@@ -57,6 +57,7 @@ export const IapContainer = compose(
       });
     },
     getFree: ({ setLoading }) => () => {
+      window.ANALYTIC.event(window.ANALYTIC_EVENTS.IAP_PROMO);
       setLoading(true);
       AlertIOS.prompt(
         'Введи промо код',
@@ -148,6 +149,8 @@ export const IapContainer = compose(
           setLoading(false);
           NoInternetConnection();
         });
+
+      window.ANALYTIC.page(window.ANALYTIC_PAGES.IAP);
     },
     componentWillUnmount() {
       EventEmitter.removeAllListeners('iap_free');

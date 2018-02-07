@@ -42,11 +42,6 @@ const WhiteButton = styled.View`
   width: 48px;
 `;
 
-const SuggestionPlace = styled.View`
-  padding: 4px;
-  padding-left: 8px;
-`;
-
 let searchRef = null;
 
 export const Screen = ({ 
@@ -223,14 +218,21 @@ export const Screen = ({
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => setMapType(MAP_TYPES.hybrid)}
-        style={{
-          marginBottom: 16,
-        }}
       >
         <WhiteButton>
           <FontAwesome name='globe' size={20} color={mapType === MAP_TYPES.hybrid ? window.SETTINGS[SETTINGS_KEYS[0]] : '#e6e6e6'} />
         </WhiteButton>
       </TouchableOpacity>
+    </ButtonsPanel>
+    <ButtonsPanel
+      row
+      style={{
+        right: 24,
+        width: 48,
+        top: 72,
+        height: 48,
+      }}
+    >
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => setFollowsUserLocation(!followsUserLocation)}

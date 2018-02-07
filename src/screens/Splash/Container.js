@@ -143,7 +143,7 @@ export const Splash = compose(
             } else {
               navigation.dispatch(replaceWith(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS })));
             }
-          }, 500)
+          }, 2000)
 
           // PushNotification.localNotificationSchedule({
           //   message: 'My Notification Message', // (required)
