@@ -152,6 +152,8 @@ export class Screen extends React.Component {
 
     const settings = this.getSettingsObject();
 
+    const SELECTED_CITY_TRANSPORT = CITIES.find(({ key }) => key === window.SETTINGS[SETTINGS_KEYS[7]]).transport;
+
     return (
       <Loader isLoading={isLoading} style={styles.container}>
         <ScrollView style={styles.container}>
@@ -296,85 +298,91 @@ export class Screen extends React.Component {
               />
             }
           />
-          <ListItem
-            title={'Цвет автобусов'}
-            onPress={() => {
-              this.setState({
-                modalColorPicker: true,
-                colorSelection: {
-                  color: settings.BUS_COLOR,
-                  colorKey: 'BUS_COLOR',
-                },
-              });
-            }}
-            rightIcon={
-              <ColorCircle
-                color={settings.BUS_COLOR}
-                onPress={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.BUS_COLOR,
-                      colorKey: 'BUS_COLOR',
-                    },
-                  });
-                }}
-              />
-            }
-          />
-          <ListItem
-            title={'Цвет троллейбусов'}
-            onPress={() => {
-              this.setState({
-                modalColorPicker: true,
-                colorSelection: {
-                  color: settings.TROLL_COLOR,
-                  colorKey: 'TROLL_COLOR',
-                },
-              });
-            }}
-            rightIcon={
-              <ColorCircle
-                color={settings.TROLL_COLOR}
-                onPress={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.TROLL_COLOR,
-                      colorKey: 'TROLL_COLOR',
-                    },
-                  });
-                }}
-              />
-            }
-          />
-          <ListItem
-            title={'Цвет трамваев'}
-            onPress={() => {
-              this.setState({
-                modalColorPicker: true,
-                colorSelection: {
-                  color: settings.TRAMM_COLOR,
-                  colorKey: 'TRAMM_COLOR',
-                },
-              });
-            }}
-            rightIcon={
-              <ColorCircle
-                color={settings.TRAMM_COLOR}
-                onPress={() => {
-                  this.setState({
-                    modalColorPicker: true,
-                    colorSelection: {
-                      color: settings.TRAMM_COLOR,
-                      colorKey: 'TRAMM_COLOR',
-                    },
-                  });
-                }}
-              />
-            }
-          />
-          {window.SETTINGS[SETTINGS_KEYS[7]] === CITIES[4].key &&
+          {SELECTED_CITY_TRANSPORT.includes(0) &&
+            <ListItem
+              title={'Цвет автобусов'}
+              onPress={() => {
+                this.setState({
+                  modalColorPicker: true,
+                  colorSelection: {
+                    color: settings.BUS_COLOR,
+                    colorKey: 'BUS_COLOR',
+                  },
+                });
+              }}
+              rightIcon={
+                <ColorCircle
+                  color={settings.BUS_COLOR}
+                  onPress={() => {
+                    this.setState({
+                      modalColorPicker: true,
+                      colorSelection: {
+                        color: settings.BUS_COLOR,
+                        colorKey: 'BUS_COLOR',
+                      },
+                    });
+                  }}
+                />
+              }
+            />
+          }
+          {SELECTED_CITY_TRANSPORT.includes(1) &&
+            <ListItem
+              title={'Цвет троллейбусов'}
+              onPress={() => {
+                this.setState({
+                  modalColorPicker: true,
+                  colorSelection: {
+                    color: settings.TROLL_COLOR,
+                    colorKey: 'TROLL_COLOR',
+                  },
+                });
+              }}
+              rightIcon={
+                <ColorCircle
+                  color={settings.TROLL_COLOR}
+                  onPress={() => {
+                    this.setState({
+                      modalColorPicker: true,
+                      colorSelection: {
+                        color: settings.TROLL_COLOR,
+                        colorKey: 'TROLL_COLOR',
+                      },
+                    });
+                  }}
+                />
+              }
+            />
+          }
+          {SELECTED_CITY_TRANSPORT.includes(2) &&
+            <ListItem
+              title={'Цвет трамваев'}
+              onPress={() => {
+                this.setState({
+                  modalColorPicker: true,
+                  colorSelection: {
+                    color: settings.TRAMM_COLOR,
+                    colorKey: 'TRAMM_COLOR',
+                  },
+                });
+              }}
+              rightIcon={
+                <ColorCircle
+                  color={settings.TRAMM_COLOR}
+                  onPress={() => {
+                    this.setState({
+                      modalColorPicker: true,
+                      colorSelection: {
+                        color: settings.TRAMM_COLOR,
+                        colorKey: 'TRAMM_COLOR',
+                      },
+                    });
+                  }}
+                />
+              }
+            />
+          }
+          {SELECTED_CITY_TRANSPORT.includes(3) &&
             <ListItem
               title={'Цвет метро'}
               onPress={() => {

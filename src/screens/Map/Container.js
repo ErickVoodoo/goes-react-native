@@ -82,8 +82,8 @@ export const MapContainer = compose(
     },
   }),
   lifecycle({
-    componentWillMount() {
-      const { setStops, navigation } = this.props;
+    componentDidMount() {
+      const { setStops, navigation, setPosition, findMe  } = this.props;
 
       if (!window.IAP.find(({ productIdentifier }) => PRODUCTS[0] === productIdentifier)) {
         Alert.alert(
@@ -105,17 +105,7 @@ export const MapContainer = compose(
 
         return;
       }
-
-      window.DB.select({
-        table: 'stops',
-      })
-        .then((stops) => {
-          setStops(stops);
-        });
-    },
-    componentDidMount() {
-      const { setPosition, findMe } = this.props;
-
+      
       // eslint-disable-next-line
       this.watchID = navigator.geolocation.watchPosition(({ coords }) => {
         setPosition({
@@ -129,10 +119,19 @@ export const MapContainer = compose(
       timer = setInterval(() => {
         findMe(false);
       }, 10000);
+
+      window.DB.select({
+        table: 'stops',
+      })
+        .then((stops) => {
+          setStops(stops);
+        });
     },
     componentWillUnmount() {
-      // eslint-disable-next-line
-      navigator.geolocation.clearWatch(this.watchID);
+      if (this.watchID) {
+        // eslint-disable-next-line
+        navigator.geolocation.clearWatch(this.watchID);
+      }
       clearInterval(timer);
     },
   }),

@@ -118,16 +118,17 @@ export const Screen = ({ restorePayments, buyProduct, isLoading, products, examp
     <ActivityIndicator style={{ flex: 1, height: '100%', backgroundColor: '#fff' }} /> :
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
       <Flex column align={'flex-start'} justify={'flex-start'} style={styles.container}>
+      
         {products.sort((a, b) => window.NaturalSort(a.price, b.price)).map(({ title, description, priceString, price, identifier }) => {
-          const { icon, analytic } = MARKET_ITEMS.find(({ identifier: v }) => v === identifier);
+          const { icon, analytic, title: sTitle, description: sDescription } = MARKET_ITEMS.find(({ identifier: v }) => v === identifier);
 
           return (<Item 
-            key={title}
+            key={identifier}
             onPress={() => { buyProduct(identifier); window.ANALYTIC.event(analytic.buy); }}
             onInfo={() => { setExampleId(identifier); window.ANALYTIC.event(analytic.info); }}
             icon={icon}
-            title={title}
-            description={description}
+            title={title || sTitle}
+            description={description || sDescription}
             priceString={priceString}
             price={price}
             disabled={window.IAP.find(({ productIdentifier }) => identifier === productIdentifier)}

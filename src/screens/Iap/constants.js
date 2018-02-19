@@ -1,8 +1,8 @@
 import { ANALYTIC_EVENTS } from '../../constants/config';
 
 export const PRODUCTS = [
-  'org.euanpa.goes.map',
-  'org.euanpa.goes.schedule',
+  'org.euanpa.goes.map2',
+  'org.euanpa.goes.schedule2',
   'org.euanpa.goes.trial',
 ];
 
@@ -13,6 +13,8 @@ export const MARKET_ITEMS = [{
     info: ANALYTIC_EVENTS.IAP_INFO_MAP,
     buy: ANALYTIC_EVENTS.IAP_BUY_MAP,
   },
+  title: 'Карта с остановками',
+  description: 'Открывает доступ к карте с остановками',
 }, {
   identifier: PRODUCTS[1],
   icon: 'heart-o',
@@ -20,6 +22,8 @@ export const MARKET_ITEMS = [{
     info: ANALYTIC_EVENTS.IAP_INFO_SCHEDULE,
     buy: ANALYTIC_EVENTS.IAP_BUY_SCHEDULE,
   },
+  title: 'Сохранение расписания',
+  description: 'Дает быстрый доступ к выбранным остановкам',
 }, {
   identifier: PRODUCTS[2],
   icon: 'gift',

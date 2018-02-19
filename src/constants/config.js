@@ -10,26 +10,38 @@ export const CITIES: Array<Object> = [{
   city: 'Брест',
   key: 'brest',
   position: { latitude: 52.102406, longitude: 23.706583 },
+  delay: 6,
+  transport: [0, 1],
 }, {
   city: 'Витебск',
   key: 'vitebsk',
   position: { latitude: 55.188402, longitude: 30.201372 },
+  delay: 6,
+  transport: [0, 1, 2],
 }, {
   city: 'Гомель',
   key: 'gomel',
   position: { latitude: 52.418822, longitude: 30.972303 },
+  delay: 6,
+  transport: [0, 1],
 }, {
   city: 'Гродно',
   key: 'grodno',
   position: { latitude: 53.682231, longitude: 23.824603 },
+  delay: 7,
+  transport: [0, 1],
 }, {
   city: 'Минск',
   key: 'minsk',
   position: { latitude: 53.894309, longitude: 27.545927 },
+  delay: 22,
+  transport: [0, 1, 2, 3],
 }, {
   city: 'Могилев',
   key: 'mogilev',
   position: { latitude: 53.897250, longitude: 30.333765 },
+  delay: 4,
+  transport: [0, 1],
 }];
 
 export const API_URL: Function = (city: string = CITIES[0].key): string => `https://euanpa.ru/${city}/api/`;

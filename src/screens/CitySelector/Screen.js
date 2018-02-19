@@ -46,7 +46,7 @@ export class Screen extends React.Component {
   onLoadSchedule = () => {
     const { navigation } = this.props;
     const { selectedCity, isLoading } = this.state;
-
+    console.log('Start', new Date());
     if (selectedCity && !isLoading) {
       this.setState({
         isLoading: true,
@@ -57,13 +57,15 @@ export class Screen extends React.Component {
       window.DB.truncate({ table: 'directions' });
       window.DB.truncate({ table: 'routes' });
       window.DB.truncate({ table: 'meta' });
-
+      console.log('Request', new Date());
       request({
         path: `${API_URL(selectedCity)}metadata?key=${API_KEY}&app_version=${window.SETTINGS[SETTINGS_KEYS[10]]}`,
         method: 'POST',
       })
-        .then((metadataResponse) =>
-          window.DB.truncate({
+        .then((metadataResponse) => {
+          console.log('Metadata', new Date());
+
+          return window.DB.truncate({
             table: 'meta',
           })
             .then(() => 
@@ -85,41 +87,47 @@ export class Screen extends React.Component {
                 values: { value: schedule }, 
                 where: { key: SETTINGS_KEYS[5] },
               });
-    
+              console.log('Request', new Date());
               request({
                 path: `${API_URL(selectedCity)}schedule?key=${API_KEY}&app_version=${window.SETTINGS[SETTINGS_KEYS[10]]}`,
                 method: 'POST',
               })
-                .then(scheduleResponse =>
-                  parseAndSave(scheduleResponse, false)
+                .then(scheduleResponse => {
+                  console.log('Schedule', new Date());
+
+                  return parseAndSave(scheduleResponse, false)
                     .then(() =>
                       window.DB.select({
                         table: 'settings',
                       })
                         .then((settings) => {
+                          console.log('Saved', new Date());
                           window.SETTINGS = settings.reduce((total, next) => {
                             const temp = total;
                             temp[next.key] = next.value;
                             return temp;
                           }, {});
-  
+
                           window.DB.select({
                             table: 'stops',
                           })
                             .then(() => {
+                              console.log('Push navigation', new Date());
                               navigation.dispatch(replaceWith(SCREEN_DRAWER));
                             });
                         }),
-                    ))
-            }),
-        )
+                    )
+                });
+            });
+        })
     }
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, selectedCity } = this.state;
 
     const MAIN_APPLICATION_COLOR = window.SETTINGS[SETTINGS_KEYS[0]];
+    const selected = CITIES.find(({ key }) => key === selectedCity);
 
     return (
       <LinearGradient
@@ -174,9 +182,10 @@ export class Screen extends React.Component {
               {isLoading ?
                 <ActivityIndicator color='#ffffff' /> :
                 <Text style={styles.container__choose__text}>
-                  ВЫБРАТЬ
+                  ЗАГРУЗИТЬ
                 </Text>
               }
+              {!isLoading && selectedCity && <Text style={{ fontSize: 12, color: '#fff' }}>{selected ? `(~${selected.delay} сек.)` : ''}</Text>}
             </View>
           </TouchableHighlight>
         </Fade>

@@ -96,6 +96,8 @@ export const getTabCounts = (tab, items) => {
 
 export const parseAndSave = (response, isReturnScheme = false) =>
   new Promise((resolve, reject) => {
+    console.log('-------');
+    console.log('Parsing', new Date());
     if (!response || !Object.keys(response).length) {
       return reject();
     }
@@ -103,7 +105,7 @@ export const parseAndSave = (response, isReturnScheme = false) =>
     const { routes: jsonRoutes, stops } = JSON.parse(response);
 
     const routes = jsonRoutes.map(({ id, name, type, active }) => ({ id, name, type, active }));
-
+    
     const directions = jsonRoutes.reduce((total, next) => {
       const r_id = next.id;
       // const directions = next.directions.map(({ name }) => name);
@@ -145,27 +147,32 @@ export const parseAndSave = (response, isReturnScheme = false) =>
       });
     }
 
-    window.DB.insertSync({
-      table: 'stops',
-      values: stops.map(item => ({ ...item, isfavorite: 0 })),
-    })
-      .then(() => 
-        window.DB.insertSync({
-          table: 'routes',
-          values: routes,
-        }),
-      )
-      .then(() =>
-        window.DB.insertSync({
-          table: 'directions',
-          values: directions.map(item => ({ ...item, isfavorite: 0 })),
-        }),
-      )
-      .then(() =>
+    console.log('Saving', new Date());
+    console.log(routes.length)
+
+    new Promise.all([
+      window.DB.insertSync({
+        table: 'stops',
+        values: stops.map(item => ({ ...item, isfavorite: 0 })),
+      }),
+      window.DB.insertSync({
+        table: 'directions',
+        values: directions.map(item => ({ ...item, isfavorite: 0 })),
+      }),
+    ])
+      .then(() => {
+        console.log('Saved, redirecting', new Date());
+
         window.DB.insertSync({
           table: 'times',
           values: times,
-        }),
-      )
-      .then(() => resolve());
+        });
+    
+        window.DB.insertSync({
+          table: 'routes',
+          values: routes,
+        });
+    
+        resolve();
+      });
   });

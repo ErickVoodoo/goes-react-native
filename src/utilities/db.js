@@ -249,11 +249,7 @@ export class DBHelper {
     this.db.transaction((tx) => {
       values
         .forEach((value, index) => {
-          tx.executeSql(this.insertQuery({ table, values: value }), null, () => {
-            if (index === values.length - 1) {
-              resolve();
-            }
-          })
+          tx.executeSql(this.insertQuery({ table, values: value }), null, index === values.length - 1 ? resolve() : null)
         });
     });
   })

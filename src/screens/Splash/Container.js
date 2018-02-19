@@ -10,7 +10,7 @@ import { bindActionCreators } from 'redux';
 import NaturalSort from 'javascript-natural-sort';
 import { GoogleAnalyticsTracker } from 'react-native-google-analytics-bridge';
 import SQLite from 'react-native-sqlite-storage';
-import { Animated } from 'react-native'; 
+import { Animated, AsyncStorage, Alert } from 'react-native'; 
 // import PushNotification from 'react-native-push-notification';
 
 import { isNetworkConnected } from '../../utilities/request';
@@ -21,6 +21,7 @@ import { setSettings as actionSetSettings } from '../../store/actions/settings';
 import { DBHelper } from '../../utilities/db';
 import { replaceWith } from '../../utilities/common';
 import { SCREEN_DRAWER, SCREEN_CITY_SELECTOR } from '../../constants/routes';
+import { STORAGE_MESSAGE } from '../../constants/storage';
 
 const mapDispatchToProps = dispatch => 
   bindActionCreators({
@@ -137,13 +138,28 @@ export const Splash = compose(
           });
         })
         .then((meta) => {
-          setTimeout(() => {
+          setTimeout(async () => {
+            const newMessage = {
+              id: 1,
+              message: 'В данном обновлении добавлен внутренний магазин дополнений! Спасибо что выбираете нас!',
+            }
+
             if (meta && meta.length) {
               navigation.dispatch(replaceWith(SCREEN_DRAWER, ({ settings: window.SETTINGS })));
+
+              const message = await AsyncStorage.getItem(STORAGE_MESSAGE);
+              const { id } = JSON.parse(message) || {};
+              
+              if (!message || newMessage.id !== id) {
+                Alert.alert(newMessage.message);
+
+                await AsyncStorage.setItem(STORAGE_MESSAGE, JSON.stringify(newMessage));
+              }
             } else {
               navigation.dispatch(replaceWith(SCREEN_CITY_SELECTOR, ({ settings: window.SETTINGS })));
+              await AsyncStorage.setItem(STORAGE_MESSAGE, JSON.stringify(newMessage));
             }
-          }, 2000)
+          }, 1500);
 
           // PushNotification.localNotificationSchedule({
           //   message: 'My Notification Message', // (required)
